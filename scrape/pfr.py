@@ -1,7 +1,7 @@
 from scrape.base import RequestsScraper, SeleniumScraper, driver
 from selenium.webdriver.support import expected_conditions as cond
 from selenium.webdriver.common.by import By
-from main import current_year
+from main import current_year, current_week
 
 import re
 
@@ -32,6 +32,7 @@ class PlayerPageScraper(RequestsScraper):
             return re.sub('.htm$', append, url)
 
         super().__init__(format_gamelog_url())
+        self.data['games'] = []
 
     def scrape_basic_info(self):
         container = self.soup.find('div', id='meta')
@@ -98,14 +99,58 @@ class PlayerPageScraper(RequestsScraper):
             return year, month, day
 
         first, last = get_name()
-        position = get_position()
-        team = get_team()
         birth_year, birth_month, birth_day = get_birth_date()
 
-        return first, last, position, team, birth_year, birth_month, birth_day, self.data['errors']
+        self.data.update({
+            'first': first,
+            'last': last,
+            'position': get_position(),
+            'team': get_team(),
+            'birth_year': birth_year,
+            'birth_month': birth_month,
+            'birth_day': birth_day
+        })
 
     def scrape_game_stats(self, week):
-        pass
+        def get_row():
+            td = self.soup.find('td', {'data-stat': 'week_num'}, text=week)
+            return td.parent
+
+        try:
+            row = get_row()
+
+            def get_datastat_text(label):
+                text = '0'
+                td = row.find('td', {'data-stat': label})
+
+                try:
+                    text = td.text
+                except AttributeError:
+                    pass
+
+                return text
+
+            self.data['games'].append({
+                'week': week,
+                'team': get_datastat_text('team'),
+                'rush_att': get_datastat_text('rush_att'),
+                'rush_yd': get_datastat_text('rush_yds'),
+                'rush_td': get_datastat_text('rush_td'),
+                'fum': get_datastat_text('fumbles'),
+                'tgt': get_datastat_text('targets'),
+                'rec': get_datastat_text('rec'),
+                'rec_yd': get_datastat_text('rec_yds'),
+                'rec_td': get_datastat_text('rec_td'),
+                'pass_att': get_datastat_text('pass_att'),
+                'pass_cmp': get_datastat_text('pass_cmp'),
+                'pass_yd': get_datastat_text('pass_yds'),
+                'pass_td': get_datastat_text('pass_td'),
+                'int': get_datastat_text('pass_int'),
+                'sacked': get_datastat_text('pass_sacked'),
+                'snaps': get_datastat_text('offense')
+            })
+        except AttributeError:
+            pass
 
 
 def scrape_season(year):
@@ -113,12 +158,14 @@ def scrape_season(year):
     player_links = PlayerListScraper(player_list_url).get_player_links()
 
     for link in player_links:
-        basic = PlayerPageScraper(link, year).scrape_basic_info()
-        print(basic)
+        print(scrape_player(link, year))
 
 
-def scrape_player(link):
-    pass
+def scrape_player(link, year):
+    player = PlayerPageScraper(link, year)
+    player.scrape_basic_info()
+    player.scrape_game_stats(current_week)
+    return player.data
 
 
 # Utilities
