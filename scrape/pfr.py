@@ -153,18 +153,34 @@ class PlayerPageScraper(RequestsScraper):
             pass
 
 
-def scrape_season(year):
+def scrape_season(year=current_year):
     player_list_url = 'https://www.pro-football-reference.com/years/%s/fantasy.htm' % year
     player_links = PlayerListScraper(player_list_url).get_player_links()
 
+    players = []
+
     for link in player_links:
-        print(scrape_player(link, year))
+        players.append(scrape_player(link, year, range(1, current_week + 1)))
+
+    return {
+        'players': players
+    }
 
 
-def scrape_player(link, year):
+def scrape_player(link, year, weeks=current_week):
     player = PlayerPageScraper(link, year)
     player.scrape_basic_info()
-    player.scrape_game_stats(current_week)
+
+    def scrape_games():
+        for week in weeks:
+            player.scrape_game_stats(week)
+
+    try:
+        scrape_games()
+    except TypeError:
+        weeks = [weeks]
+        scrape_games()
+
     return player.data
 
 
