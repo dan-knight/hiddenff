@@ -19,11 +19,10 @@ def scrape_and_export():
 def check_scraped_errors(filename):
     data = import_scrape(filename)
 
-    with_errors = [player for player in data['players'] if player['errors']]
-
-    for player in with_errors:
-        print('%s %s (%s - %s): %s' %
-              (player['first'], player['last'], player['position'], player['team'], player['errors']))
+    for player in data['players']:
+        if player['errors']:
+            print('%s %s (%s - %s): %s' %
+                  (player['first'], player['last'], player['position'], player['team'], player['errors']))
 
 
 # Utilities
@@ -55,10 +54,11 @@ def export_scrape(filename, data):
 
 
 def import_scrape(filename):
-    with open('./scrape/data/%s' % split_filename_type(filename, 'json')) as file:
+    with open('./scrape/data/%s%s' % split_filename_type(filename, 'json')) as file:
         return json.load(file)
 
 
 if __name__ == '__main__':
-    scrape_and_export()
+    # scrape_and_export()
+    check_scraped_errors('scrape_2020-04-15_17-47-30.json')
     driver.close()
