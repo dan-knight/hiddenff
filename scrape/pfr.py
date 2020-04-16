@@ -1,4 +1,4 @@
-from scrape.base import RequestsScraper, SeleniumScraper, driver
+from scrape.base import RequestsScraper
 from selenium.webdriver.support import expected_conditions as cond
 from selenium.webdriver.common.by import By
 from main import current_year, current_week
@@ -64,6 +64,10 @@ class PlayerPageScraper(RequestsScraper):
                     return re.sub('^: ', '', stripped)
 
                 text = format_position()
+
+                if text == 'FB':
+                    text = 'RB'
+
             except AttributeError:
                 self.data['errors'].append('position')
 
@@ -157,14 +161,9 @@ def scrape_season(year=current_year):
     player_list_url = 'https://www.pro-football-reference.com/years/%s/fantasy.htm' % year
     player_links = PlayerListScraper(player_list_url).get_player_links()
 
-    players = []
+    players = [(scrape_player(link, year, range(1, current_week + 1))) for link in player_links]
 
-    for link in player_links:
-        players.append(scrape_player(link, year, range(1, current_week + 1)))
-
-    return {
-        'players': players
-    }
+    return players
 
 
 def scrape_player(link, year, weeks=current_week):

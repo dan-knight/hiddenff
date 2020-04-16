@@ -1,4 +1,5 @@
 from scrape import pfr
+from scrape import guru
 from scrape.base import driver
 import db
 import learn
@@ -59,6 +60,8 @@ def import_scrape(filename):
 
 
 if __name__ == '__main__':
-    # scrape_and_export()
-    check_scraped_errors('scrape_2020-04-15_17-47-30.json')
+    guru = guru.scrape_week()
+    for player in guru:
+        print(player)
+
     driver.close()
