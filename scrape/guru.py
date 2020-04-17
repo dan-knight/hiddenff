@@ -30,15 +30,21 @@ class PlayerPageScraper(RequestsScraper):
             try:
                 full_name = container.find('b').text
 
-                def split_name(separator):
-                    split = full_name.split(separator)
-                    return split[0], split[1]
-
                 try:
-                    last_text, first_text = split_name(', ')
+                    def get_player_name():
+                        split_text = full_name.split(', ')
+                        return split_text[1], split_text[0]
+
+                    first_text, last_text = get_player_name()
                 except IndexError:
                     if 'Defense' in full_name:
-                        first_text, last_text = split_name(' ')
+                        def get_defense_name():
+                            split_text = full_name.split(' ')
+                            defense = split_text.pop()
+                            location = ' '.join(split_text)
+                            return location, defense
+
+                        first_text, last_text = get_defense_name()
                     else:
                         add_error()
             except AttributeError:

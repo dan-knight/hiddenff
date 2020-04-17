@@ -61,7 +61,6 @@ def import_scrape(filename):
 
 if __name__ == '__main__':
     guru = guru.scrape_week()
-    for player in guru:
-        print(player)
+    export_scrape('guru-scrape', guru)
 
     driver.close()
