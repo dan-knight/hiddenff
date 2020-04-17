@@ -1,26 +1,30 @@
 from scrape.base import RequestsScraper
-from selenium.webdriver.support import expected_conditions as cond
-from selenium.webdriver.common.by import By
-from main import current_year, current_week
+from config import current_year, current_week
 
 import re
 
 
 class PlayerListScraper(RequestsScraper):
-    pass
+    def __init__(self, url):
+        super().__init__(url)
 
-    def get_player_links(self):
-        def get_rows():
-            container = self.soup.find('div', id='all_fantasy')
-            tbody = container.find('tbody')
-            return tbody.find_all('tr', class_=lambda x: x != 'thead')
+        def get_container():
+            div = self.soup.find('div', id='all_fantasy')
+            return div.find('tbody')
 
-        def get_link(row):
-            td = row.find('td', {'data-stat': 'player'})
-            a = td.find('a')
-            return prepend_link(a['href'])
+        self.container = get_container()
 
-        return [get_link(row) for row in get_rows()]
+    def get_link(self, first, last):
+        link = ''
+        full_name = ' '.join((first, last))
+        a = self.container.find('a', text=full_name)
+
+        try:
+            link = prepend_link(a['href'])
+        except TypeError:
+            pass
+
+        return link
 
 
 class PlayerPageScraper(RequestsScraper):
@@ -115,7 +119,7 @@ class PlayerPageScraper(RequestsScraper):
             'birth_day': birth_day
         })
 
-    def scrape_game_stats(self, week):
+    def scrape_game_stats(self, week=current_week):
         def get_row():
             td = self.soup.find('td', {'data-stat': 'week_num'}, text=week)
             return td.parent
@@ -157,16 +161,7 @@ class PlayerPageScraper(RequestsScraper):
             pass
 
 
-def scrape_season(year=current_year):
-    player_list_url = 'https://www.pro-football-reference.com/years/%s/fantasy.htm' % year
-    player_links = PlayerListScraper(player_list_url).get_player_links()
-
-    players = [(scrape_player(link, year, range(1, current_week + 1))) for link in player_links]
-
-    return players
-
-
-def scrape_player(link, year, weeks=current_week):
+def scrape_player(link, year=current_year, weeks=current_week):
     player = PlayerPageScraper(link, year)
     player.scrape_basic_info()
 

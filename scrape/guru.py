@@ -13,9 +13,7 @@ class PlayerListScraper(RequestsScraper):
 
 
 class PlayerPageScraper(RequestsScraper):
-    def __init__(self, url):
-        super().__init__(url)
-        self.data['games'] = []
+    pass
 
     def scrape_basic_info(self):
         def get_name():

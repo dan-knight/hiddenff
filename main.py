@@ -3,6 +3,7 @@ from scrape import guru
 from scrape.base import driver
 import db
 import learn
+from config import current_year
 
 import json
 import re
@@ -17,6 +18,29 @@ def scrape_and_export():
     export_scrape('scrape', data)
 
 
+def scrape_player(guru_link):
+    guru_data = guru.scrape_player(guru_link)
+
+    pfr_link = pfr_player_list.get_link(guru_data['first'], guru_data['last'])
+    pfr_data = pfr.scrape_player(pfr_link)
+
+    def combine_scraped_data():
+        player_data = {}
+        player_data.update(pfr_data)
+        player_data.update({
+            'first': guru_data['first'],
+            'last': guru_data['last'],
+            'position': guru_data['position']
+        })
+
+        player_data['url'] = [guru_data['url'], pfr_data['url']]
+        player_data['errors'] = [guru_data['errors'] + pfr_data['errors']]
+
+        return player_data
+
+    return combine_scraped_data()
+
+
 def check_scraped_errors(filename):
     data = import_scrape(filename)
 
@@ -27,8 +51,8 @@ def check_scraped_errors(filename):
 
 
 # Utilities
-current_year = 2019
-current_week = 17
+pfr_player_list_url = 'https://www.pro-football-reference.com/years/%s/fantasy.htm' % current_year
+pfr_player_list = pfr.PlayerListScraper(pfr_player_list_url)
 
 
 def split_filename_type(filename, file_type):
@@ -60,7 +84,10 @@ def import_scrape(filename):
 
 
 if __name__ == '__main__':
-    guru = guru.scrape_week()
-    export_scrape('guru-scrape', guru)
+    guru_list_url = 'http://rotoguru1.com/cgi-bin/fstats.cgi?pos=0&sort=1&game=p&colA=0&daypt=0&xavg=0&inact=0&maxprc=99999&outcsv=0'
+
+    for link in guru.PlayerListScraper(guru_list_url).get_player_links():
+        player = scrape_player(link)
+        print(player)
 
     driver.close()
