@@ -2,6 +2,7 @@ from scrape.base import RequestsScraper
 from config import current_year, current_week
 
 import re
+import json
 
 
 class PlayerListScraper(RequestsScraper):
@@ -14,15 +15,22 @@ class PlayerListScraper(RequestsScraper):
 
         self.container = get_container()
 
-    def get_link(self, first, last):
+    def get_player_link(self, first, last):
         link = ''
         full_name = ' '.join((first, last))
-        a = self.container.find('a', text=full_name)
+
+        def get_link(name):
+            a = self.container.find('a', text=name)
+            return prepend_link(a['href'])
+
+        def check_errors():
+            error_name = errors['player_names'].get(full_name)
+            return error_name if error_name else errors['player_links'].get(full_name, '')
 
         try:
-            link = prepend_link(a['href'])
+            link = get_link(full_name)
         except TypeError:
-            pass
+            link = check_errors()
 
         return link
 
@@ -179,5 +187,9 @@ def scrape_player(link, year=current_year, weeks=current_week):
 
 
 # Utilities
+with open('./scrape/error/pfr.json') as file:
+    errors = json.load(file)
+
+
 def prepend_link(link):
     return 'https://www.pro-football-reference.com' + link

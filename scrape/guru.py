@@ -1,6 +1,6 @@
 from scrape.base import RequestsScraper
 
-from io import StringIO
+import re
 
 
 class PlayerListScraper(RequestsScraper):
@@ -9,7 +9,11 @@ class PlayerListScraper(RequestsScraper):
     def get_player_links(self):
         container = self.soup.find('pre')
         link_tags = container.find_all('a', href=lambda href: href.startswith('playrf'))
-        return [prepend_link(tag['href']) for tag in link_tags]
+
+        def is_defense(a):
+            return a.previous_sibling.strip().endswith('D')
+
+        return [prepend_link(tag['href']) for tag in link_tags if not is_defense(tag)]
 
 
 class PlayerPageScraper(RequestsScraper):

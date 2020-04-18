@@ -21,8 +21,9 @@ def scrape_and_export():
 def scrape_player(guru_link):
     guru_data = guru.scrape_player(guru_link)
 
-    pfr_link = pfr_player_list.get_link(guru_data['first'], guru_data['last'])
-    pfr_data = pfr.scrape_player(pfr_link)
+    pfr_link = pfr_player_list.get_player_link(guru_data['first'], guru_data['last'])
+
+    # pfr_data = pfr.scrape_player(pfr_link)
 
     def combine_scraped_data():
         player_data = {}
@@ -38,7 +39,8 @@ def scrape_player(guru_link):
 
         return player_data
 
-    return combine_scraped_data()
+    return pfr_link
+    # return combine_scraped_data()
 
 
 def check_scraped_errors(filename):
@@ -86,8 +88,14 @@ def import_scrape(filename):
 if __name__ == '__main__':
     guru_list_url = 'http://rotoguru1.com/cgi-bin/fstats.cgi?pos=0&sort=1&game=p&colA=0&daypt=0&xavg=0&inact=0&maxprc=99999&outcsv=0'
 
+    no_link = []
     for link in guru.PlayerListScraper(guru_list_url).get_player_links():
         player = scrape_player(link)
+        if not player:
+            no_link.append(link)
+
+    print(len(no_link))
+    for player in no_link:
         print(player)
 
     driver.close()
