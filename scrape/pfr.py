@@ -25,7 +25,7 @@ class PlayerListScraper(RequestsScraper):
 
         def check_errors():
             error_name = errors['player_names'].get(full_name)
-            return error_name if error_name else errors['player_links'].get(full_name, '')
+            return get_link(error_name) if error_name else prepend_link(errors['player_links'].get(full_name, ''))
 
         try:
             link = get_link(full_name)
@@ -109,7 +109,7 @@ class PlayerPageScraper(RequestsScraper):
                 year = split_text[0]
                 month = split_text[1]
                 day = split_text[2]
-            except (AttributeError, IndexError):
+            except (TypeError, IndexError):
                 self.data['errors'].append('birth_date')
 
             return year, month, day
