@@ -60,30 +60,9 @@ class PlayerPageScraper(RequestsScraper):
                 first_text = split_name[0]
                 last_text = split_name[1]
             except (IndexError, AttributeError):
-                self.data['errors'].append('name')
+                self.add_error('name')
 
             return first_text, last_text
-
-        def get_position():
-            text = ''
-            strong = container.find('strong', text={re.compile('Position')})
-
-            try:
-                raw_text = strong.next_sibling
-
-                def format_position():
-                    stripped = raw_text.strip()
-                    return re.sub('^: ', '', stripped)
-
-                text = format_position()
-
-                if text == 'FB':
-                    text = 'RB'
-
-            except AttributeError:
-                self.data['errors'].append('position')
-
-            return text
 
         def get_team():
             text = ''
@@ -92,7 +71,7 @@ class PlayerPageScraper(RequestsScraper):
             try:
                 text = span.text
             except AttributeError:
-                self.data['errors'].append('team')
+                self.add_error('team')
 
             return text
 
@@ -110,7 +89,7 @@ class PlayerPageScraper(RequestsScraper):
                 month = split_text[1]
                 day = split_text[2]
             except (TypeError, IndexError):
-                self.data['errors'].append('birth_date')
+                self.add_error('birth_date')
 
             return year, month, day
 
@@ -120,7 +99,6 @@ class PlayerPageScraper(RequestsScraper):
         self.data.update({
             'first': first,
             'last': last,
-            'position': get_position(),
             'team': get_team(),
             'birth_year': birth_year,
             'birth_month': birth_month,

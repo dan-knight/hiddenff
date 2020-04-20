@@ -27,7 +27,7 @@ class PlayerPageScraper(RequestsScraper):
             container = self.soup.find('font', size=3)
 
             def add_error():
-                self.data['errors'].append('name')
+                self.add_error('name')
 
             try:
                 full_name = container.find('b').text
@@ -61,7 +61,7 @@ class PlayerPageScraper(RequestsScraper):
             try:
                 text = label.next_sibling.text
             except AttributeError:
-                self.data['errors'].append('position')
+                self.add_error('position')
 
             return text
 

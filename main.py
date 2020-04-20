@@ -1,5 +1,6 @@
 from scrape import pfr
 from scrape import guru
+from scrape import wiki
 from scrape.base import driver
 import db
 import learn
@@ -10,12 +11,13 @@ import re
 from datetime import datetime
 
 
-def scrape_and_export():
+def scrape_and_export(guru_list_link):
     data = {
-        'players': pfr.scrape_season()
+        'players': [scrape_player(link) for link in guru.PlayerListScraper(guru_list_link).get_player_links()]
     }
 
-    export_scrape('scrape', data)
+    export_path = export_scrape('guru-pfr-scrape', data)
+    check_scraped_errors(export_path)
 
 
 def scrape_player(guru_link):
@@ -34,7 +36,7 @@ def scrape_player(guru_link):
         })
 
         player_data['url'] = [guru_data['url'], pfr_data['url']]
-        player_data['errors'] = [guru_data['errors'] + pfr_data['errors']]
+        player_data['errors'] = guru_data['errors'] + pfr_data['errors']
 
         return player_data
 
@@ -73,9 +75,13 @@ def get_timestamp():
 
 def export_scrape(filename, data):
     name, suffix = split_filename_type(filename, 'json')
+    filename = '%s_%s%s' % (name, get_timestamp(), suffix)
+    export_path = './scrape/data/' + filename
 
-    with open('./scrape/data/%s_%s%s' % (name, get_timestamp(), suffix), 'w') as file:
+    with open(export_path, 'w') as file:
         json.dump(data, file)
+
+    return filename
 
 
 def import_scrape(filename):
@@ -84,8 +90,10 @@ def import_scrape(filename):
 
 
 if __name__ == '__main__':
-    guru_list_url = 'http://rotoguru1.com/cgi-bin/fstats.cgi?pos=0&sort=1&game=p&colA=0&daypt=0&xavg=0&inact=0&maxprc=99999&outcsv=0'
-    players = [scrape_player(link) for link in guru.PlayerListScraper(guru_list_url).get_player_links()]
-    export_scrape('guru-pfr-scrape', {'players': players})
+    # guru_list_url = 'http://rotoguru1.com/cgi-bin/fstats.cgi?pos=0&sort=1&game=p&colA=0&daypt=0&xavg=0&inact=0&maxprc=99999&outcsv=0'
+    # scrape_and_export(guru_list_url)
+
+    wiki_data = wiki.scrape_player('https://en.wikipedia.org/wiki/Jay_Ajayi')
+    print(wiki_data)
 
     driver.close()

@@ -24,6 +24,9 @@ class Scraper(object):
     def get_html(self):
         return ''
 
+    def add_error(self, error_name):
+        self.data['errors'].append(error_name)
+
 
 class RequestsScraper(Scraper):
     def __init__(self, url):
@@ -47,14 +50,13 @@ class SeleniumScraper(Scraper):
     def setup_page(self):
         try:
             driver.get(self.data['url'])
-            self.__class__.interact_with_page()
+            self.__class__.interact_with_page(self)
         except (TimeoutException, ElementNotInteractableException):
             restart_driver()
             driver.get(self.data['url'])
-            self.__class__.interact_with_page()
+            self.__class__.interact_with_page(self)
 
-    @staticmethod
-    def interact_with_page():
+    def interact_with_page(self):
         pass
 
     @staticmethod
