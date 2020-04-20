@@ -19,8 +19,8 @@ class PlayerPageScraper(RequestsScraper):
         try:
             span = self.card.find('span', attrs={'class': 'org'})
             team_text = span.text
-        except TypeError:
-            self.add_error('name')
+        except AttributeError:
+            self.add_error('team')
 
         self.data['team'] = team_text
 
@@ -47,7 +47,7 @@ class PlayerPageScraper(RequestsScraper):
 
             year, month, day = split_birthdate()
 
-        except TypeError:
+        except AttributeError:
             self.add_error('birthdate')
 
         self.data['birth_year'] = year
