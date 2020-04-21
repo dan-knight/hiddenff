@@ -8,6 +8,27 @@ import json
 import re
 
 
+class PlayerListScraper(SeleniumScraper):
+    pass
+
+    def interact_with_page(self):
+        super().wait_for_condition(cond.presence_of_element_located(
+            (By.CLASS_NAME, 'mw-category')
+        ))
+
+    def get_links(self, full_name):
+        player_links = []
+        container = self.soup.find('div', attrs={'class': 'mw-category'})
+
+        try:
+            a = container.find_all('a', text=re.compile(full_name))
+            player_links = [prepend_link(link['href']) for link in a]
+        except TypeError:
+            self.add_error('player_link')
+
+        self.data['player_links'] = player_links
+
+
 class PlayerPageScraper(RequestsScraper):
     def __init__(self, url):
         super().__init__(url)
@@ -60,6 +81,27 @@ def scrape_player(link):
     scraper.get_team()
     scraper.get_birthdate()
     return scraper.data
+
+
+def get_player_links(first, last, position):
+    positions = {
+        'RB': 'running_backs',
+        'WR': 'wide_receivers',
+        'QB': 'quarterbacks',
+        'TE': 'tight_ends'
+    }
+
+    def format_position_url():
+        position_suffix = positions.pop(position)
+        print(positions)
+        last_name_suffix = last[0]
+        return 'https://en.wikipedia.org/wiki/Category:American_football_%s?from=%s' % \
+               (position_suffix, last_name_suffix)
+
+    scraper = PlayerListScraper(format_position_url())
+    full_name = '%s %s' % (first, last)
+    scraper.get_links(full_name)
+    print(scraper.data)
 
 
 # Utilities

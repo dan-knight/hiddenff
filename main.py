@@ -93,11 +93,6 @@ if __name__ == '__main__':
     # guru_list_url = 'http://rotoguru1.com/cgi-bin/fstats.cgi?pos=0&sort=1&game=p&colA=0&daypt=0&xavg=0&inact=0&maxprc=99999&outcsv=0'
     # scrape_and_export(guru_list_url)
 
-    wiki_links = ['https://en.wikipedia.org/wiki/Jay_Ajayi',
-                  'https://en.wikipedia.org/wiki/Tom_Brady',
-                  'https://en.wikipedia.org/wiki/Peyton_Manning']
-
-    for link in wiki_links:
-        print(wiki.scrape_player(link))
+    wiki.get_player_links('Jay', 'Ajayi', 'RB')
 
     driver.close()
