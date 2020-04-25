@@ -59,7 +59,7 @@ class PlayerListScraper(SeleniumScraper):
             return get_last_name()
 
         last_player = get_last_player()
-        return last > last_player
+        return last >= last_player
 
 
 class PlayerPageScraper(RequestsScraper):
@@ -117,61 +117,74 @@ def scrape_player(link):
 
 
 def get_player_links(first, last, position):
-    positions = {
-        'RB': 'running_backs',
-        'WR': 'wide_receivers',
-        'QB': 'quarterbacks',
-        'TE': 'tight_ends'
-    }
+    links = ''
+    error_link = errors['player_links'].get(get_full_name(first, last))
 
-    def get_name():
-        error_name = errors['player_names'].get(get_full_name(first, last))
-        return (error_name['first'], error_name['last']) if error_name else (first, last)
+    if error_link:
+        links = [error_link]
+    else:
+        def scrape_player_links():
+            positions = {
+                'RB': 'running_backs',
+                'WR': 'wide_receivers',
+                'QB': 'quarterbacks',
+                'TE': 'tight_ends',
+                'FB': 'fullbacks'
+            }
 
-    first_name, last_name = get_name()
-    full_name = get_full_name(first_name, last_name)
+            def get_name():
+                error_name = errors['player_names'].get(get_full_name(first, last))
+                return (error_name['first'], error_name['last']) if error_name else (first, last)
 
-    def scrape_position(position_suffix):
-        def format_url():
-            last_name_suffix = last_name[0]
-            return 'https://en.wikipedia.org/wiki/Category:American_football_%s?from=%s' % \
-                   (position_suffix, last_name_suffix)
+            first_name, last_name = get_name()
+            full_name = get_full_name(first_name, last_name)
 
-        scraper = PlayerListScraper(format_url())
+            def scrape_position(position_suffix):
+                def format_url():
+                    last_name_suffix = last_name[0]
+                    return 'https://en.wikipedia.org/wiki/Category:American_football_%s?from=%s' % \
+                           (position_suffix, last_name_suffix)
 
-        def scrape_list():
-            scraper.get_links(full_name)
-            links = scraper.data['player_links']
-            return links
+                scraper = PlayerListScraper(format_url())
 
-        links = scrape_list()
+                def scrape_list():
+                    scraper.get_links(full_name)
+                    links = scraper.data['player_links']
+                    return links
 
-        if not links:
-            while scraper.check_last_link(last_name):
-                next_page = scraper.get_next_page_url()
-                scraper = PlayerListScraper(next_page)
                 links = scrape_list()
 
-        return links
+                if not links:
+                    while scraper.check_last_link(last_name):
+                        next_page = scraper.get_next_page_url()
+                        scraper = PlayerListScraper(next_page)
+                        links = scrape_list()
 
-    guru_position = positions.pop(position)
-    player_links = scrape_position(guru_position)
+                return links
 
-    if not player_links:
-        def scrape_other_positions():
-            links = []
+            guru_position = positions.pop(position)
+            player_links = scrape_position(guru_position)
 
-            for position_key in positions.keys():
-                links = scrape_position(positions[position_key])
+            if not player_links:
+                def scrape_other_positions():
+                    links = []
 
-                if links:
-                    break
+                    for position_key in positions.keys():
+                        links = scrape_position(positions[position_key])
 
-            return links
+                        if links:
+                            break
 
-        player_links = scrape_other_positions()
+                    return links
 
-    return player_links
+                player_links = scrape_other_positions()
+
+            return player_links
+
+        links = scrape_player_links()
+
+    return links
+
 
 # Utilities
 with open('./scrape/error/wiki.json') as file:

@@ -120,17 +120,7 @@ def import_scrape(filename):
 
 
 if __name__ == '__main__':
-    # guru_list_url = 'http://rotoguru1.com/cgi-bin/fstats.cgi?pos=0&sort=1&game=p&colA=0&daypt=0&xavg=0&inact=0&maxprc=99999&outcsv=0'
-    # scrape_and_export(guru_list_url)
-
-    data = [
-        scrape_player('http://rotoguru1.com/cgi-bin/playrf.cgi?5323'),
-        scrape_player('http://rotoguru1.com/cgi-bin/playrf.cgi?3474')
-    ]
-
-    for player in data:
-        print('%s %s: %s %s' % (player['first'], player['last'], player['position'], player['team']))
-        for game in player['games']:
-            print(game)
+    guru_list_url = 'http://rotoguru1.com/cgi-bin/fstats.cgi?pos=0&sort=1&game=p&colA=0&daypt=0&xavg=0&inact=0&maxprc=99999&outcsv=0'
+    scrape_and_export(guru_list_url)
 
     driver.close()

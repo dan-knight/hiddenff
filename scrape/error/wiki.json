@@ -3,8 +3,21 @@
     "C.J. Anderson": {
       "first": "C. J.",
       "last": "Anderson"
+    },
+    "T.J. Jones": {
+      "first": "T. J.",
+      "last": "Jones"
+    },
+    "J.J. Nelson": {
+      "first": "J. J.",
+      "last": "Nelson"
+    },
+    "Ben Watson": {
+      "first": "Benjamin",
+      "last": "Watson"
     }
   },
   "player_links": {
+    "Chester Rogers": "https://en.wikipedia.org/wiki/Chester_Rogers"
   }
 }
