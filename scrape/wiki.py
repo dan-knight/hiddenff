@@ -9,24 +9,57 @@ import re
 
 
 class PlayerListScraper(SeleniumScraper):
-    pass
+    def __init__(self, url):
+        super().__init__(url)
+        self.data['player_links'] = []
+
+        def get_container():
+            category = self.soup.find('div', attrs={'class': 'mw-category'})
+            return category if category else self.soup.find('div', attrs={'class': 'mw-category-generated'})
+
+        self.container = get_container()
 
     def interact_with_page(self):
-        super().wait_for_condition(cond.presence_of_element_located(
-            (By.CLASS_NAME, 'mw-category')
-        ))
+        try:
+            super().wait_for_condition(cond.presence_of_element_located(
+                (By.CLASS_NAME, 'mw-category')
+            ))
+        except TimeoutException:
+            super().wait_for_condition(cond.presence_of_element_located(
+                (By.CLASS_NAME, 'mw-category-generated')
+            ))
 
     def get_links(self, full_name):
         player_links = []
-        container = self.soup.find('div', attrs={'class': 'mw-category'})
 
         try:
-            a = container.find_all('a', text=re.compile(full_name))
+            a = self.container.find_all('a', text=re.compile(full_name))
             player_links = [prepend_link(link['href']) for link in a]
         except TypeError:
-            self.add_error('player_link')
+            pass
 
         self.data['player_links'] = player_links
+
+    def get_next_page_url(self):
+        div = self.soup.find('div', id='mw-pages')
+        a = div.find('a', text='next page')
+        return prepend_link(a['href'])
+
+    def check_last_link(self, last):
+        def get_last_player():
+            links = self.container.find_all('li')
+            li = links[len(links) - 1]
+            a = li.find('a')
+            name = a.text
+
+            def get_last_name():
+                name_no_parenthesis = name.split(' (')[0]
+                return name_no_parenthesis.split(' ')[-1]
+
+            return get_last_name()
+
+        last_player = get_last_player()
+        return last > last_player
 
 
 class PlayerPageScraper(RequestsScraper):
@@ -91,18 +124,54 @@ def get_player_links(first, last, position):
         'TE': 'tight_ends'
     }
 
-    def format_position_url():
-        position_suffix = positions.pop(position)
-        print(positions)
-        last_name_suffix = last[0]
-        return 'https://en.wikipedia.org/wiki/Category:American_football_%s?from=%s' % \
-               (position_suffix, last_name_suffix)
+    def get_name():
+        error_name = errors['player_names'].get(get_full_name(first, last))
+        return (error_name['first'], error_name['last']) if error_name else (first, last)
 
-    scraper = PlayerListScraper(format_position_url())
-    full_name = '%s %s' % (first, last)
-    scraper.get_links(full_name)
-    print(scraper.data)
+    first_name, last_name = get_name()
+    full_name = get_full_name(first_name, last_name)
 
+    def scrape_position(position_suffix):
+        def format_url():
+            last_name_suffix = last_name[0]
+            return 'https://en.wikipedia.org/wiki/Category:American_football_%s?from=%s' % \
+                   (position_suffix, last_name_suffix)
+
+        scraper = PlayerListScraper(format_url())
+
+        def scrape_list():
+            scraper.get_links(full_name)
+            links = scraper.data['player_links']
+            return links
+
+        links = scrape_list()
+
+        if not links:
+            while scraper.check_last_link(last_name):
+                next_page = scraper.get_next_page_url()
+                scraper = PlayerListScraper(next_page)
+                links = scrape_list()
+
+        return links
+
+    guru_position = positions.pop(position)
+    player_links = scrape_position(guru_position)
+
+    if not player_links:
+        def scrape_other_positions():
+            links = []
+
+            for position_key in positions.keys():
+                links = scrape_position(positions[position_key])
+
+                if links:
+                    break
+
+            return links
+
+        player_links = scrape_other_positions()
+
+    return player_links
 
 # Utilities
 with open('./scrape/error/wiki.json') as file:
@@ -111,6 +180,11 @@ with open('./scrape/error/wiki.json') as file:
 
 def prepend_link(link):
     return 'https://en.wikipedia.org' + link
+
+
+def get_full_name(first, last):
+    full_name = '%s %s' % (first, last)
+    return full_name.strip()
 
 
 

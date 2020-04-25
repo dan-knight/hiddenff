@@ -17,7 +17,7 @@ def scrape_and_export(guru_list_link):
     }
 
     export_path = export_scrape('guru-pfr-scrape', data)
-    check_scraped_errors(export_path)
+    print_scraped_errors(export_path)
 
 
 def scrape_player(guru_link):
@@ -43,11 +43,13 @@ def scrape_player(guru_link):
     return combine_scraped_data()
 
 
-def check_scraped_errors(filename):
+def get_scraped_errors(filename):
     data = import_scrape(filename)
+    return [player for player in data['players'] if player['errors']]
 
-    for player in data['players']:
-        if player['errors']:
+
+def print_scraped_errors(filename):
+    for player in get_scraped_errors(filename):
             print('%s %s (%s - %s): %s' %
                   (player['first'], player['last'], player['position'], player['team'], player['errors']))
 
@@ -93,6 +95,12 @@ if __name__ == '__main__':
     # guru_list_url = 'http://rotoguru1.com/cgi-bin/fstats.cgi?pos=0&sort=1&game=p&colA=0&daypt=0&xavg=0&inact=0&maxprc=99999&outcsv=0'
     # scrape_and_export(guru_list_url)
 
-    wiki.get_player_links('Jay', 'Ajayi', 'RB')
+    errors = get_scraped_errors('guru-pfr-scrape_2020-04-18_18-18-37.json')
+    for player in errors:
+        print(player['first'], player['last'])
+        links = wiki.get_player_links(player['first'], player['last'], player['position'])
+        if links:
+            for link in links:
+                print(wiki.scrape_player(link))
 
     driver.close()
