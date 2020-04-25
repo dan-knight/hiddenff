@@ -11,7 +11,7 @@ from bs4 import BeautifulSoup
 class Scraper(object):
     def __init__(self, url):
         print(url)
-        self.data = {'errors': [],
+        self.data = {'errors': set(),
                      'url': url}
         self.soup = self.get_soup()
 
@@ -25,7 +25,7 @@ class Scraper(object):
         return ''
 
     def add_error(self, error_name):
-        self.data['errors'].append(error_name)
+        self.data['errors'].add(error_name)
 
 
 class RequestsScraper(Scraper):

@@ -24,21 +24,49 @@ def scrape_player(guru_link):
     guru_data = guru.scrape_player(guru_link)
 
     pfr_link = pfr_player_list.get_player_link(guru_data['first'], guru_data['last'])
-    pfr_data = pfr.scrape_player(pfr_link)
+    pfr_data = pfr.scrape_player(pfr_link, weeks=range(1, 18))
 
     def combine_scraped_data():
-        player_data = {}
-        player_data.update(pfr_data)
-        player_data.update({
+        scraped_data = {
+            'links': [guru_data['url'], pfr_data['url']],
             'first': guru_data['first'],
             'last': guru_data['last'],
-            'position': guru_data['position']
-        })
+            'position': guru_data['position'],
+            'team': pfr_data['team'],
+            'birth_year': pfr_data['birth_year'],
+            'birth_month': pfr_data['birth_month'],
+            'birth_day': pfr_data['birth_day'],
+            'games': pfr_data['games']
+        }
 
-        player_data['url'] = [guru_data['url'], pfr_data['url']]
-        player_data['errors'] = guru_data['errors'] + pfr_data['errors']
+        def check_errors():
+            def combine_errors():
+                all_errors = guru_data['errors']
+                all_errors.update(pfr_data['errors'])
+                return all_errors
 
-        return player_data
+            errors = combine_errors()
+
+            if errors:
+                wiki_links = wiki.get_player_links(scraped_data['first'], scraped_data['last'], scraped_data['position'])
+                for link in wiki_links:
+                    wiki_data = wiki.scrape_player(link)
+
+                    def is_same_birthday():
+                        return wiki_data['birth_year'] == scraped_data['birth_year'] and \
+                               wiki_data['birth_month'] == scraped_data['birth_month'] and \
+                               wiki_data['birth_day'] == scraped_data['birth_day']
+
+                    if is_same_birthday():
+                        def update_scraped_data():
+                            for error in errors:
+                                scraped_data.update({error: wiki_data[error]})
+
+                        update_scraped_data()
+                        break
+
+        check_errors()
+        return scraped_data
 
     return combine_scraped_data()
 
@@ -95,12 +123,14 @@ if __name__ == '__main__':
     # guru_list_url = 'http://rotoguru1.com/cgi-bin/fstats.cgi?pos=0&sort=1&game=p&colA=0&daypt=0&xavg=0&inact=0&maxprc=99999&outcsv=0'
     # scrape_and_export(guru_list_url)
 
-    errors = get_scraped_errors('guru-pfr-scrape_2020-04-18_18-18-37.json')
-    for player in errors:
-        print(player['first'], player['last'])
-        links = wiki.get_player_links(player['first'], player['last'], player['position'])
-        if links:
-            for link in links:
-                print(wiki.scrape_player(link))
+    data = [
+        scrape_player('http://rotoguru1.com/cgi-bin/playrf.cgi?5323'),
+        scrape_player('http://rotoguru1.com/cgi-bin/playrf.cgi?3474')
+    ]
+
+    for player in data:
+        print('%s %s: %s %s' % (player['first'], player['last'], player['position'], player['team']))
+        for game in player['games']:
+            print(game)
 
     driver.close()
