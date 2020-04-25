@@ -16,7 +16,7 @@ def scrape_and_export(guru_list_link):
         'players': [scrape_player(link) for link in guru.PlayerListScraper(guru_list_link).get_player_links()]
     }
 
-    export_path = export_scrape('guru-pfr-scrape', data)
+    export_path = export_scrape('guru-pfr-wiki-scrape', data)
     print_scraped_errors(export_path)
 
 
@@ -25,6 +25,11 @@ def scrape_player(guru_link):
 
     pfr_link = pfr_player_list.get_player_link(guru_data['first'], guru_data['last'])
     pfr_data = pfr.scrape_player(pfr_link, weeks=range(1, 18))
+
+    def combine_errors():
+        all_errors = guru_data['errors']
+        all_errors.update(pfr_data['errors'])
+        return all_errors
 
     def combine_scraped_data():
         scraped_data = {
@@ -36,18 +41,12 @@ def scrape_player(guru_link):
             'birth_year': pfr_data['birth_year'],
             'birth_month': pfr_data['birth_month'],
             'birth_day': pfr_data['birth_day'],
-            'games': pfr_data['games']
+            'games': pfr_data['games'],
+            'errors': combine_errors()
         }
 
         def check_errors():
-            def combine_errors():
-                all_errors = guru_data['errors']
-                all_errors.update(pfr_data['errors'])
-                return all_errors
-
-            errors = combine_errors()
-
-            if errors:
+            if scraped_data['errors']:
                 wiki_links = wiki.get_player_links(scraped_data['first'], scraped_data['last'], scraped_data['position'])
                 for link in wiki_links:
                     wiki_data = wiki.scrape_player(link)
@@ -59,8 +58,9 @@ def scrape_player(guru_link):
 
                     if is_same_birthday():
                         def update_scraped_data():
-                            for error in errors:
+                            for error in scraped_data['errors'].copy():
                                 scraped_data.update({error: wiki_data[error]})
+                                scraped_data['errors'].remove(error)
 
                         update_scraped_data()
                         break
