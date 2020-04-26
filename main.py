@@ -26,11 +26,6 @@ def scrape_player(guru_link):
     pfr_link = pfr_player_list.get_player_link(guru_data['first'], guru_data['last'])
     pfr_data = pfr.scrape_player(pfr_link, weeks=range(1, 18))
 
-    def combine_errors():
-        all_errors = guru_data['errors']
-        all_errors.update(pfr_data['errors'])
-        return all_errors
-
     def combine_scraped_data():
         scraped_data = {
             'links': [guru_data['url'], pfr_data['url']],
@@ -42,11 +37,27 @@ def scrape_player(guru_link):
             'birth_month': pfr_data['birth_month'],
             'birth_day': pfr_data['birth_day'],
             'games': pfr_data['games'],
-            'errors': combine_errors()
         }
 
+        def check_data_errors():
+            full_name = '%s %s' % (scraped_data['first'], scraped_data['last'])
+
+            def update_from_errors(errors):
+                scraped_data.update(errors['data'].get(full_name, {}))
+
+            update_from_errors(pfr.errors)
+
+        check_data_errors()
+
         def check_errors():
-            if scraped_data['errors']:
+            def combine_errors():
+                all_errors = guru_data['errors']
+                all_errors.update(pfr_data['errors'])
+                return all_errors
+
+            errors = combine_errors()
+
+            if errors:
                 wiki_links = wiki.get_player_links(scraped_data['first'], scraped_data['last'], scraped_data['position'])
                 for link in wiki_links:
                     wiki_data = wiki.scrape_player(link)
@@ -58,12 +69,14 @@ def scrape_player(guru_link):
 
                     if is_same_birthday():
                         def update_scraped_data():
-                            for error in scraped_data['errors'].copy():
+                            for error in errors.copy():
                                 scraped_data.update({error: wiki_data[error]})
-                                scraped_data['errors'].remove(error)
+                                errors.remove(error)
 
                         update_scraped_data()
                         break
+
+            scraped_data.update({'errors': list(errors)})
 
         check_errors()
         return scraped_data
@@ -73,7 +86,7 @@ def scrape_player(guru_link):
 
 def get_scraped_errors(filename):
     data = import_scrape(filename)
-    return [player for player in data['players'] if player['errors']]
+    return [player for player in data['players'] if player.get('errors')]
 
 
 def print_scraped_errors(filename):

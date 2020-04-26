@@ -14,5 +14,16 @@
   },
   "player_links": {
     "Patrick Ricard": "/players/R/RicaPa00.htm"
+  },
+  "data": {
+    "Peyton Barber": {
+      "birth_month": "06"
+    },
+    "Kenjon Barner": {
+      "birth_year": "1989"
+    },
+    "Zach Line": {
+      "birth_month": "04"
+    }
   }
 }
