@@ -150,10 +150,14 @@ if __name__ == '__main__':
     players = import_scrape('guru-pfr-wiki-scrape_2020-04-25_11-16-46.json')['players']
 
     for player in players:
-        db_player = db.create_player(player)
-        db.add_player(db_player)
+        db_player = db.Player.get(player)
 
-        found = db.find_player(player)
-        print(found)
+        if not db_player:
+            db_player = db.Player.new(player)
+
+        for game in player['games']:
+            db_player.player_games.append(db.PlayerGame.new(game))
+
+        db.session.add(db_player)
 
     db.session.commit()

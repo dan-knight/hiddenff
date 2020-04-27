@@ -23,34 +23,93 @@ class Player(Base):
     birth_month = Column(Integer, nullable=False)
     birth_day = Column(Integer, nullable=False)
 
+    player_games = relationship('PlayerGame', back_populates='player')
+
     def __repr__(self):
         return '%s %s (%s): %s' % (self.first, self.last, self.position, self.team)
 
+    @staticmethod
+    def new(player_data):
+        player = Player(first=player_data['first'],
+                        last=player_data['last'],
+                        position=player_data['position'],
+                        team=team_keys[player_data['team']],
+                        birth_year=player_data['birth_year'],
+                        birth_month=player_data['birth_month'],
+                        birth_day=player_data['birth_day'])
 
-def create_player(player_data):
-    player = Player(first=player_data['first'],
-                    last=player_data['last'],
-                    position=player_data['position'],
-                    team=team_keys[player_data['team']],
-                    birth_year=player_data['birth_year'],
-                    birth_month=player_data['birth_month'],
-                    birth_day=player_data['birth_day'])
+        return player
 
-    return player
+    @staticmethod
+    def get(player_data):
+        player = session.query(Player).filter_by(first=player_data['first'],
+                                                 last=player_data['last'],
+                                                 birth_year=player_data['birth_year'],
+                                                 birth_month=player_data['birth_month'],
+                                                 birth_day=player_data['birth_day']).first()
 
-
-def add_player(player):
-    session.add(player)
+        return player
 
 
-def find_player(player_data):
-    player = session.query(Player).filter_by(first=player_data['first'],
-                                             last=player_data['last'],
-                                             birth_year=player_data['birth_year'],
-                                             birth_month=player_data['birth_month'],
-                                             birth_day=player_data['birth_day']).first()
+class PlayerGame(Base):
+    __tablename__ = 'player_games'
 
-    return player
+    id = Column(Integer, primary_key=True)
+    player_id = Column(Integer, ForeignKey('players.id'))
+    week = Column(Integer, nullable=False)
+    team = Column(String(3), nullable=False)
+
+    rush_att = Column(Integer, nullable=False)
+    rush_yd = Column(Integer, nullable=False)
+    rush_td = Column(Integer, nullable=False)
+    fum = Column(Integer, nullable=False)
+
+    tgt = Column(Integer, nullable=False)
+    rec = Column(Integer, nullable=False)
+    rec_yd = Column(Integer, nullable=False)
+    rec_td = Column(Integer, nullable=False)
+
+    pass_att = Column(Integer, nullable=False)
+    pass_cmp = Column(Integer, nullable=False)
+    pass_yd = Column(Integer, nullable=False)
+    pass_td = Column(Integer, nullable=False)
+    int = Column(Integer, nullable=False)
+    sacked = Column(Integer, nullable=False)
+
+    snaps = Column(Integer, nullable=False)
+
+    player = relationship('Player', back_populates='player_games')
+
+    @staticmethod
+    def new(game_data):
+        def check_stat(stat):
+            scraped_stat = game_data[stat]
+            return scraped_stat if scraped_stat else '0'
+
+        game = PlayerGame(week=game_data['week'],
+                          team=team_keys[game_data['team']],
+                          rush_att=check_stat('rush_att'),
+                          rush_yd=check_stat('rush_yd'),
+                          rush_td=check_stat('rush_td'),
+                          fum=check_stat('fum'),
+                          tgt=check_stat('tgt'),
+                          rec=check_stat('rec'),
+                          rec_yd=check_stat('rec_yd'),
+                          rec_td=check_stat('rec_td'),
+                          pass_att=check_stat('pass_att'),
+                          pass_cmp=check_stat('pass_cmp'),
+                          pass_yd=check_stat('pass_yd'),
+                          pass_td=check_stat('pass_td'),
+                          int=check_stat('int'),
+                          sacked=check_stat('sacked'),
+                          snaps=game_data['snaps']
+                          )
+
+        return game
+
+    @staticmethod
+    def find(game_data):
+        pass
 
 
 # Utilities
@@ -67,25 +126,25 @@ def get_team_keys():
     teams.update(dict.fromkeys(['Dallas Cowboys', 'DAL'], 'DAL'))
     teams.update(dict.fromkeys(['Denver Broncos', 'DEN'], 'DEN'))
     teams.update(dict.fromkeys(['Detroit Lions', 'DET'], 'DET'))
-    teams.update(dict.fromkeys(['Green Bay Packers', 'GB'], 'GB'))
+    teams.update(dict.fromkeys(['Green Bay Packers', 'GB', 'GNB'], 'GB'))
     teams.update(dict.fromkeys(['Houston Texans', 'HOU'], 'HOU'))
     teams.update(dict.fromkeys(['Indianapolis Colts', 'IND'], 'IND'))
     teams.update(dict.fromkeys(['Jacksonville Jaguars', 'JAX'], 'JAX'))
-    teams.update(dict.fromkeys(['Kansas City Chiefs', 'KC'], 'KC'))
+    teams.update(dict.fromkeys(['Kansas City Chiefs', 'KC', 'KAN'], 'KC'))
     teams.update(dict.fromkeys(['Las Vegas Raiders', 'Oakland Raiders', 'OAK'], 'OAK'))
     teams.update(dict.fromkeys(['Los Angeles Chargers', 'LAC'], 'LAC'))
     teams.update(dict.fromkeys(['Los Angeles Rams', 'LAR'], 'LAR'))
     teams.update(dict.fromkeys(['Miami Dolphins', 'MIA'], 'MIA'))
     teams.update(dict.fromkeys(['Minnesota Vikings', 'MIN'], 'MIN'))
-    teams.update(dict.fromkeys(['New England Patriots', 'NE'], 'NE'))
-    teams.update(dict.fromkeys(['New Orleans Saints', 'NO'], 'NO'))
+    teams.update(dict.fromkeys(['New England Patriots', 'NE', 'NWE'], 'NE'))
+    teams.update(dict.fromkeys(['New Orleans Saints', 'NO', 'NOR'], 'NO'))
     teams.update(dict.fromkeys(['New York Giants', 'NYG'], 'NYG'))
     teams.update(dict.fromkeys(['New York Jets', 'NYJ'], 'NYJ'))
     teams.update(dict.fromkeys(['Philadelphia Eagles', 'PHI'], 'PHI'))
     teams.update(dict.fromkeys(['Pittsburgh Steelers', 'PIT'], 'PIT'))
-    teams.update(dict.fromkeys(['San Francisco 49ers', 'SF'], 'SF'))
+    teams.update(dict.fromkeys(['San Francisco 49ers', 'SF', 'SFO'], 'SF'))
     teams.update(dict.fromkeys(['Seattle Seahawks', 'SEA'], 'SEA'))
-    teams.update(dict.fromkeys(['Tampa Bay Buccaneers', 'TB'], 'TB'))
+    teams.update(dict.fromkeys(['Tampa Bay Buccaneers', 'TB', 'TAM'], 'TB'))
     teams.update(dict.fromkeys(['Tennessee Titans', 'TEN'], 'TEN'))
     teams.update(dict.fromkeys(['Washington Redskins', 'WAS'], 'WAS'))
     teams.update(dict.fromkeys(['Free agent', ''], ''))
