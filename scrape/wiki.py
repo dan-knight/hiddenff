@@ -74,7 +74,7 @@ class PlayerPageScraper(RequestsScraper):
             span = self.card.find('span', attrs={'class': 'org'})
             team_text = span.text
         except AttributeError:
-            self.add_error('team')
+            pass
 
         self.data['team'] = team_text
 
