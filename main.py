@@ -144,8 +144,10 @@ if __name__ == '__main__':
     # scrape_and_export(guru_list_url)
 
     driver.close()
-    # scraped_players = import_scrape('guru-pfr-wiki-scrape_2020-04-25_11-16-46.json')['players']
+    db.reset_tables()
+    scraped_players = import_scrape('guru-pfr-wiki-scrape_2020-04-25_11-16-46.json')['players']
 
-    print(len(db.session.query(db.PlayerGame).all()))
+    for player in scraped_players:
+        db.Player.update(player)
 
     db.session.commit()

@@ -2,8 +2,10 @@ from sqlalchemy import create_engine, Column, Integer, String, ForeignKey
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, relationship
 
+import os
 
-uri = 'mysql+pymysql://root:@localhost:3307/hiddenff'
+
+uri = os.getenv('DATABASE_URI')
 engine = create_engine(uri)
 Session = sessionmaker(bind=engine)
 session = Session()
