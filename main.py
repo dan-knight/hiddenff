@@ -14,8 +14,6 @@ from datetime import datetime
 
 
 # Database
-def add_player(player):
-    pass
 
 
 # Scraping
@@ -146,18 +144,8 @@ if __name__ == '__main__':
     # scrape_and_export(guru_list_url)
 
     driver.close()
-    db.reset_tables()
-    players = import_scrape('guru-pfr-wiki-scrape_2020-04-25_11-16-46.json')['players']
+    # scraped_players = import_scrape('guru-pfr-wiki-scrape_2020-04-25_11-16-46.json')['players']
 
-    for player in players:
-        db_player = db.Player.get(player)
-
-        if not db_player:
-            db_player = db.Player.new(player)
-
-        for game in player['games']:
-            db_player.player_games.append(db.PlayerGame.new(game))
-
-        db.session.add(db_player)
+    print(len(db.session.query(db.PlayerGame).all()))
 
     db.session.commit()

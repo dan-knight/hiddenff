@@ -28,6 +28,33 @@ class Player(Base):
     def __repr__(self):
         return '%s %s (%s): %s' % (self.first, self.last, self.position, self.team)
 
+    modifiable_columns = {'position', 'team'}
+
+    @staticmethod
+    def update(player_data):
+        db_player = Player.get(player_data)
+
+        if not db_player:
+            db_player = Player.new(player_data)
+            session.add(db_player)
+        else:
+            update_row(db_player, player_data)
+
+        for game in player_data.get('games'):
+            db_player.update_game(game)
+
+    def update_game(self, game_data):
+        week = game_data.get('week')
+
+        if week:
+            db_game = PlayerGame.get(self.id, week)
+
+            if not db_game:
+                db_game = (PlayerGame.new(game_data))
+                self.player_games.append(db_game)
+            else:
+                update_row(db_game, game_data)
+
     @staticmethod
     def new(player_data):
         player = Player(first=player_data['first'],
@@ -62,7 +89,6 @@ class PlayerGame(Base):
     rush_att = Column(Integer, nullable=False)
     rush_yd = Column(Integer, nullable=False)
     rush_td = Column(Integer, nullable=False)
-    fum = Column(Integer, nullable=False)
 
     tgt = Column(Integer, nullable=False)
     rec = Column(Integer, nullable=False)
@@ -73,12 +99,21 @@ class PlayerGame(Base):
     pass_cmp = Column(Integer, nullable=False)
     pass_yd = Column(Integer, nullable=False)
     pass_td = Column(Integer, nullable=False)
+
+    fum = Column(Integer, nullable=False)
     int = Column(Integer, nullable=False)
     sacked = Column(Integer, nullable=False)
-
     snaps = Column(Integer, nullable=False)
 
     player = relationship('Player', back_populates='player_games')
+
+    modifiable_columns = {
+        'team',
+        'rush_att', 'rush_yd', 'rush_td', 'fum',
+        'tgt', 'rec', 'rec_yd', 'rec_td',
+        'pass_att', 'pass_cmp', 'pass_yd', 'pass_td',
+        'fum', 'int', 'sacked', 'snaps'
+    }
 
     @staticmethod
     def new(game_data):
@@ -91,7 +126,6 @@ class PlayerGame(Base):
                           rush_att=check_stat('rush_att'),
                           rush_yd=check_stat('rush_yd'),
                           rush_td=check_stat('rush_td'),
-                          fum=check_stat('fum'),
                           tgt=check_stat('tgt'),
                           rec=check_stat('rec'),
                           rec_yd=check_stat('rec_yd'),
@@ -100,6 +134,7 @@ class PlayerGame(Base):
                           pass_cmp=check_stat('pass_cmp'),
                           pass_yd=check_stat('pass_yd'),
                           pass_td=check_stat('pass_td'),
+                          fum=check_stat('fum'),
                           int=check_stat('int'),
                           sacked=check_stat('sacked'),
                           snaps=game_data['snaps']
@@ -108,8 +143,19 @@ class PlayerGame(Base):
         return game
 
     @staticmethod
-    def find(game_data):
-        pass
+    def get(player_id, week):
+        game = session.query(PlayerGame).filter_by(player_id=player_id,
+                                                   week=week).first()
+
+        return game
+
+
+def update_row(row, new_data):
+    for column in row.modifiable_columns:
+        new_value = new_data[column]
+
+        if new_value and not row.__getattribute__(column) == new_value:
+            row.__setattr__(column, new_value)
 
 
 # Utilities
