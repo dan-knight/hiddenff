@@ -22,8 +22,7 @@ def scrape_players_and_export(guru_list_link):
         'players': [scrape_player(link) for link in guru.PlayerListScraper(guru_list_link).get_player_links()]
     }
 
-    export_path = export_scrape('player-scrape', data)
-    print_scraped_errors(export_path)
+    export_scrape('player-scrape', data)
 
 
 def scrape_player(guru_link):
@@ -106,25 +105,36 @@ def scrape_games_and_export():
         'games': [scrape_game(link) for link in pfr_links]
     }
 
-    export_path = export_scrape('game-scrape', data)
-    print_scraped_errors(export_path)
+    export_scrape('game-scrape', data)
 
 
 def scrape_game(pfr_link):
     pfr_data = pfr.scrape_game(pfr_link)
+    pfr_data['errors'] = list(pfr_data['errors'])
 
     return pfr_data
 
 
 def get_scraped_errors(filename):
     data = import_scrape(filename)
-    return [player for player in data['players'] if player.get('errors')]
+    errors = {}
+
+    for key in data.keys():
+        errors[key] = [x for x in data[key] if x.get('errors')]
+
+    return errors
 
 
 def print_scraped_errors(filename):
-    for player in get_scraped_errors(filename):
-        print('%s %s (%s - %s): %s' %
-              (player['first'], player['last'], player['position'], player['team'], player['errors']))
+    errors = get_scraped_errors(filename)
+
+    for key in errors.keys():
+        print(key)
+
+        for error in errors[key]:
+            print(error)
+
+        print()
 
 
 def export_scrape(filename, data):
@@ -134,8 +144,6 @@ def export_scrape(filename, data):
 
     with open(export_path, 'w') as file:
         json.dump(data, file)
-
-    return filename
 
 
 # Utilities
@@ -171,7 +179,11 @@ if __name__ == '__main__':
     # guru_list_url = 'http://rotoguru1.com/cgi-bin/fstats.cgi?pos=0&sort=1&game=p&colA=0&daypt=0&xavg=0&inact=0&maxprc=99999&outcsv=0'
     # scrape_and_export(guru_list_url)
 
-    scrape_games_and_export()
+    #scrape_games_and_export()
+
+    scrape_path = 'guru-pfr-wiki-scrape_2020-04-25_11-16-46.json'
+    print_scraped_errors(scrape_path)
+
     driver.close()
 
     # db.reset_tables()
