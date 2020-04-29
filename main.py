@@ -17,12 +17,12 @@ from datetime import datetime
 
 
 # Scraping
-def scrape_and_export(guru_list_link):
+def scrape_players_and_export(guru_list_link):
     data = {
         'players': [scrape_player(link) for link in guru.PlayerListScraper(guru_list_link).get_player_links()]
     }
 
-    export_path = export_scrape('guru-pfr-wiki-scrape', data)
+    export_path = export_scrape('player-scrape', data)
     print_scraped_errors(export_path)
 
 
@@ -91,6 +91,25 @@ def scrape_player(guru_link):
     return combine_scraped_data()
 
 
+def scrape_games_and_export():
+    def get_pfr_links():
+        links = []
+
+        for week in range(1, current_week + 1):
+            links += pfr_game_list.get_week_links(week)
+
+        return links
+
+    pfr_links = get_pfr_links()
+
+    data = {
+        'games': [scrape_game(link) for link in pfr_links]
+    }
+
+    export_path = export_scrape('game-scrape', data)
+    print_scraped_errors(export_path)
+
+
 def scrape_game(pfr_link):
     pfr_data = pfr.scrape_game(pfr_link)
 
@@ -152,13 +171,7 @@ if __name__ == '__main__':
     # guru_list_url = 'http://rotoguru1.com/cgi-bin/fstats.cgi?pos=0&sort=1&game=p&colA=0&daypt=0&xavg=0&inact=0&maxprc=99999&outcsv=0'
     # scrape_and_export(guru_list_url)
 
-    game_links = []
-    for week in range(1, current_week + 1):
-        game_links += pfr_game_list.get_week_links(week)
-
-    for link in game_links:
-        print(scrape_game(link))
-
+    scrape_games_and_export()
     driver.close()
 
     # db.reset_tables()
