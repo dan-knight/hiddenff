@@ -35,6 +35,33 @@ class PlayerListScraper(RequestsScraper):
         return link
 
 
+class GameListScraper(RequestsScraper):
+    def __init__(self, url):
+        super().__init__(url)
+
+        def get_container():
+            div = self.soup.find('div', id='all_games')
+            return div.find('tbody')
+
+        self.container = get_container()
+
+    def get_week_links(self, week):
+        cells = self.container.find_all('th', {'data-stat': 'week_num'}, text=week)
+        return [GameListScraper.get_link(th.parent) for th in cells]
+
+    @staticmethod
+    def get_link(row):
+        link = ''
+
+        try:
+            a = row.find('a', text='boxscore')
+            link = prepend_link(a['href'])
+        except AttributeError:
+            pass
+
+        return link
+
+
 class PlayerPageScraper(RequestsScraper):
     def __init__(self, url, year=current_year):
         self.year = year

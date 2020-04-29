@@ -98,8 +98,8 @@ def get_scraped_errors(filename):
 
 def print_scraped_errors(filename):
     for player in get_scraped_errors(filename):
-            print('%s %s (%s - %s): %s' %
-                  (player['first'], player['last'], player['position'], player['team'], player['errors']))
+        print('%s %s (%s - %s): %s' %
+              (player['first'], player['last'], player['position'], player['team'], player['errors']))
 
 
 def export_scrape(filename, data):
@@ -116,6 +116,9 @@ def export_scrape(filename, data):
 # Utilities
 pfr_player_list_url = 'https://www.pro-football-reference.com/years/%s/fantasy.htm' % current_year
 pfr_player_list = pfr.PlayerListScraper(pfr_player_list_url)
+
+pfr_game_list_url = 'https://www.pro-football-reference.com/years/%s/games.htm' % current_year
+pfr_game_list = pfr.GameListScraper(pfr_game_list_url)
 
 
 def split_filename_type(filename, file_type):
@@ -144,10 +147,8 @@ if __name__ == '__main__':
     # scrape_and_export(guru_list_url)
 
     driver.close()
-    db.reset_tables()
-    scraped_players = import_scrape('guru-pfr-wiki-scrape_2020-04-25_11-16-46.json')['players']
 
-    for player in scraped_players:
-        db.Player.update(player)
+    print(pfr_game_list.get_week_links(1))
 
-    db.session.commit()
+    # db.reset_tables()
+    # db.session.commit()
