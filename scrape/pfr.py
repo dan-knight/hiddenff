@@ -143,23 +143,9 @@ class GamePageScraper(SeleniumScraper):
             spread_text = get_row_value('Vegas Line')
             over_under_text = get_row_value('Over/Under')
 
-            def get_weather():
-                text = ''
+            return roof_text, surface_text, spread_text, over_under_text
 
-                th = div.find('th', {'data-stat': 'info'},
-                                  text=re.compile('Weather'))
-
-                if th:
-                    try:
-                        text = th.next_sibling.text
-                    except AttributeError:
-                        self.add_error('weather')
-
-                return text
-
-            return roof_text, surface_text, spread_text, over_under_text, get_weather()
-
-        roof, surface, spread, over_under, weather = scrape_game_info()
+        roof, surface, spread, over_under = scrape_game_info()
 
         self.data.update({
             'week': get_week(),
@@ -170,7 +156,6 @@ class GamePageScraper(SeleniumScraper):
             'surface': surface,
             'spread': spread,
             'over_under': over_under,
-            'weather': weather
         })
 
     def scrape_team_info(self):

@@ -179,10 +179,7 @@ if __name__ == '__main__':
     # guru_list_url = 'http://rotoguru1.com/cgi-bin/fstats.cgi?pos=0&sort=1&game=p&colA=0&daypt=0&xavg=0&inact=0&maxprc=99999&outcsv=0'
     # scrape_and_export(guru_list_url)
 
-    #scrape_games_and_export()
-
-    scrape_path = 'guru-pfr-wiki-scrape_2020-04-25_11-16-46.json'
-    print_scraped_errors(scrape_path)
+    scrape_games_and_export()
 
     driver.close()
 
