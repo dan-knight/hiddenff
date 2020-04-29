@@ -6,7 +6,7 @@ from scrape.base import driver
 from db import db
 
 import learn
-from config import current_year
+from config import current_year, current_week
 
 import json
 import re
@@ -91,6 +91,12 @@ def scrape_player(guru_link):
     return combine_scraped_data()
 
 
+def scrape_game(pfr_link):
+    pfr_data = pfr.scrape_game(pfr_link)
+
+    return pfr_data
+
+
 def get_scraped_errors(filename):
     data = import_scrape(filename)
     return [player for player in data['players'] if player.get('errors')]
@@ -146,9 +152,14 @@ if __name__ == '__main__':
     # guru_list_url = 'http://rotoguru1.com/cgi-bin/fstats.cgi?pos=0&sort=1&game=p&colA=0&daypt=0&xavg=0&inact=0&maxprc=99999&outcsv=0'
     # scrape_and_export(guru_list_url)
 
-    driver.close()
+    game_links = []
+    for week in range(1, current_week + 1):
+        game_links += pfr_game_list.get_week_links(week)
 
-    print(pfr_game_list.get_week_links(1))
+    for link in game_links:
+        print(scrape_game(link))
+
+    driver.close()
 
     # db.reset_tables()
     # db.session.commit()
