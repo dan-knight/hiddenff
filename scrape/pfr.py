@@ -46,23 +46,32 @@ class PlayerListScraper(RequestsScraper):
         self.container = get_container()
 
     def get_player_link(self, first, last):
-        link = ''
         full_name = ' '.join((first, last))
 
         def get_link(name):
-            a = self.container.find('a', text=name)
-            return prepend_link(a['href'])
+            link = ''
 
-        def check_errors():
-            error_name = errors['player_names'].get(full_name)
-            return get_link(error_name) if error_name else prepend_link(errors['player_links'].get(full_name, ''))
+            def get_name_matches():
+                return self.container.find_all('a', text=name)
 
-        try:
-            link = get_link(full_name)
-        except TypeError:
-            link = check_errors()
+            def get_href(a):
+                return prepend_link(a['href'])
 
-        return link
+            link_matches = get_name_matches()
+
+            if len(link_matches) == 1:
+                link = get_href(link_matches[0])
+            elif len(link_matches) == 0:
+                error_name = errors['player_names'].get(full_name)
+
+                if error_name:
+                    link = get_link(error_name)
+                else:
+                    link = prepend_link(errors['player_links'].get(full_name))
+
+            return link
+
+        return get_link(full_name)
 
 
 class GamePageScraper(SeleniumScraper):
