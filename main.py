@@ -183,17 +183,5 @@ def import_scrape(filename):
 
 if __name__ == '__main__':
     guru_list_url = 'http://rotoguru1.com/cgi-bin/fstats.cgi?pos=0&sort=1&game=p&colA=0&daypt=0&xavg=0&inact=0&maxprc=99999&outcsv=0'
-    #scrape_players_and_export(guru_list_url)
     driver.close()
 
-    db.reset_tables()
-
-    players = import_scrape('player-scrape_2020-05-01_18-03-11.json')['players']
-
-    for player in players:
-        print('%s %s' % (player['first'], player['last']))
-        db.Player.update(player)
-
-    print(db.Player.get(players[0]))
-
-    db.session.commit()

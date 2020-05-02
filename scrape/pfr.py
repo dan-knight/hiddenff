@@ -1,5 +1,6 @@
 from scrape.base import RequestsScraper, SeleniumScraper
 from config import current_year, current_week
+from utility import month_keys
 
 from selenium.webdriver.support import expected_conditions as cond
 from selenium.webdriver.common.by import By
@@ -117,6 +118,77 @@ class GamePageScraper(SeleniumScraper):
 
                 return text
 
+
+
+            def get_start():
+                start = ''
+
+                def get_date():
+                    def get_text():
+                        text_ = ''
+
+                        try:
+                            div = meta_div.find('div')
+                            text_ = div.text
+                        except AttributeError:
+                            self.add_error('date')
+
+                        return text_
+
+                    text = get_text()
+
+                    def format_date():
+                        text_ = ''
+                        try:
+                            split_text = text.split(' ')
+
+                            def get_day():
+                                day_text = split_text[2].strip(',')
+
+                                if int(day_text) < 10:
+                                    day_text = '0' + day_text
+
+                                return day_text
+
+                            year = split_text[-1]
+                            month = month_keys[split_text[1]]
+                            day = get_day()
+                            text_ = '-'.join([year, month, day])
+                        except IndexError:
+                            self.add_error('date')
+
+                        return text_
+
+                    if text:
+                        text = format_date()
+
+                    return text
+
+                def get_time():
+                    time_text = get_meta_text("Start Time")
+
+                    def format_time():
+                        text = time_text
+                        if time_text.endswith('pm'):
+                            split_text = time_text[:-2].split(':')
+                            hours = int(split_text[0]) + 12
+                            text = '%s:%s:00' % (str(hours), split_text[1])
+
+                        return text
+
+                    if time_text:
+                        time_text = format_time()
+
+                    return time_text
+
+                date = get_date()
+                time = get_time()
+
+                if date and time:
+                    start = '%s %s' % (get_date(), get_time())
+
+                return start
+
             def get_stadium():
                 text = ''
 
@@ -130,13 +202,13 @@ class GamePageScraper(SeleniumScraper):
 
                 return text
 
-            start_time_text = get_meta_text("Start Time")
+            start_text = get_start()
             stadium_text = get_stadium()
             length_text = get_meta_text('Time of Game')
 
-            return start_time_text, stadium_text, length_text
+            return start_text, stadium_text, length_text
 
-        start_time, stadium, length = scrape_scorebox()
+        start, stadium, length = scrape_scorebox()
 
         def scrape_game_info():
             div = self.soup.find('table', id='game_info')
@@ -158,7 +230,7 @@ class GamePageScraper(SeleniumScraper):
 
         self.data.update({
             'week': get_week(),
-            'start_time': start_time,
+            'start': start,
             'stadium': stadium,
             'length': length,
             'roof': roof,
@@ -231,12 +303,18 @@ class GamePageScraper(SeleniumScraper):
 
                     return snaps
 
+                name = get_element_text(
+                        team_div.find('a', {'itemprop': 'name'}), 'name')
+
+                score = get_element_text(
+                        team_div.find('div', attrs={'class': 'score'}), 'score')
+
+                snaps = get_snaps()
+
                 return {
-                    'name': get_element_text(
-                        team_div.find('a', {'itemprop': 'name'}), 'name'),
-                    'score': get_element_text(
-                        team_div.find('div', attrs={'class': 'score'}), 'score'),
-                    'snaps': get_snaps()
+                    'name': name,
+                    'score': score,
+                    'snaps': snaps
                 }
 
             teams.append(scrape_team())
