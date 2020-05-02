@@ -3,6 +3,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, relationship
 
 import os
+import datetime as dt
 
 
 uri = os.getenv('DATABASE_URI')
@@ -61,16 +62,12 @@ class Player(Base):
                         last=player_data['last'],
                         position=player_data['position'],
                         team=team_keys[player_data['team']],
-                        birth_year=player_data['birth_year'],
-                        birth_month=player_data['birth_month'],
-                        birth_day=player_data['birth_day'])
+                        birthday=create_date(player_data['birthday']))
 
         return player
 
     @staticmethod
     def get(player_data):
-        # TODO Check player_data['birthday'] and convert to datetime object if needed.
-
         player = session.query(Player).filter_by(first=player_data['first'],
                                                  last=player_data['last'],
                                                  birthday=player_data['birthday']).first()
@@ -204,3 +201,11 @@ team_keys = get_team_keys()
 def reset_tables():
     Base.metadata.drop_all(engine)
     Base.metadata.create_all(engine)
+
+
+def create_date(iso_date):
+    split_text = iso_date.split('-')
+
+    return dt.date(int(split_text[0]),
+                   int(split_text[1]),
+                   int(split_text[2]))
