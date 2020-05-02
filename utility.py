@@ -1,7 +1,27 @@
+import datetime as dt
+
+
+def create_datetime(iso_datetime):
+    split_text = iso_datetime.split(' ')
+
+    date = create_date(split_text[0])
+    time = create_time(split_text[1])
+
+    return dt.datetime.combine(date, time)
+
+
 def create_date(iso_date):
     split_text = iso_date.split('-')
 
     return dt.date(int(split_text[0]),
+                   int(split_text[1]),
+                   int(split_text[2]))
+
+
+def create_time(iso_time):
+    split_text = iso_time.split(':')
+
+    return dt.time(int(split_text[0]),
                    int(split_text[1]),
                    int(split_text[2]))
 
@@ -62,3 +82,14 @@ def get_month_keys():
 
 
 month_keys = get_month_keys()
+
+
+def get_roof_keys():
+    roofs = {}
+    roofs.update(dict.fromkeys(['dome', 'retractable roof (closed)'], True))
+    roofs.update(dict.fromkeys(['outdoors', 'retractable roof (open)'], False))
+
+    return roofs
+
+
+roof_keys = get_roof_keys()

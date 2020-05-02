@@ -1,6 +1,6 @@
-from utility import team_keys, create_date
+from utility import team_keys, roof_keys, create_datetime, create_date
 
-from sqlalchemy import create_engine, Column, Integer, String, Date, DateTime, ForeignKey
+from sqlalchemy import create_engine, Column, Integer, String, DateTime, Date, Time, Boolean, ForeignKey
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, relationship
 
@@ -147,6 +147,37 @@ class PlayerGame(Base):
                                                    week=week).first()
 
         return game
+
+
+class Game(Base):
+    __tablename__ = 'games'
+
+    id = Column(Integer, primary_key=True)
+    week = Column(Integer)
+    start = Column(DateTime, nullable=False)
+    length = Column(Integer)
+    stadium = Column(String(255), nullable=False)
+    roof = Column(Boolean)
+    surface = Column(String(255))
+
+    @staticmethod
+    def new(game_data):
+        def parse_length():
+            split_text = game_data['length'].split(':')
+            timedelta = dt.timedelta(int(split_text[0]),
+                                     int(split_text[1]))
+
+            return timedelta.total_seconds()
+
+        start = create_datetime(game_data['start'])
+        length = parse_length()
+
+        return Game(week=game_data['week'],
+                    start=start,
+                    length=length,
+                    stadium=game_data['stadium'],
+                    roof=roof_keys[game_data['roof']],
+                    surface=game_data['surface'])
 
 
 def update_row(row, new_data):

@@ -183,5 +183,14 @@ def import_scrape(filename):
 
 if __name__ == '__main__':
     guru_list_url = 'http://rotoguru1.com/cgi-bin/fstats.cgi?pos=0&sort=1&game=p&colA=0&daypt=0&xavg=0&inact=0&maxprc=99999&outcsv=0'
+
+
+    # scrape_games_and_export()
     driver.close()
 
+    db.reset_tables()
+    for game in import_scrape('game-scrape_2020-05-02_04-17-22.json')['games']:
+        print(game)
+        db.session.add(db.Game.new(game))
+
+    db.session.commit()

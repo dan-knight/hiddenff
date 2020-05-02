@@ -168,11 +168,15 @@ class GamePageScraper(SeleniumScraper):
                     time_text = get_meta_text("Start Time")
 
                     def format_time():
-                        text = time_text
-                        if time_text.endswith('pm'):
-                            split_text = time_text[:-2].split(':')
-                            hours = int(split_text[0]) + 12
-                            text = '%s:%s:00' % (str(hours), split_text[1])
+                        split_text = time_text[:-2].split(':')
+                        hours = int(split_text[0])
+
+                        if time_text.endswith('pm') and hours < 12:
+                            hours += 12
+                        elif hours < 10:
+                            hours = '0' + str(hours)
+
+                        text = '%s:%s:00' % (str(hours), split_text[1])
 
                         return text
 
