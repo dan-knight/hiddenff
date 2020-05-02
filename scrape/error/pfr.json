@@ -19,13 +19,13 @@
   },
   "data": {
     "Peyton Barber": {
-      "birth_month": "06"
+      "birthday": "1994-06-27"
     },
     "Kenjon Barner": {
-      "birth_year": "1989"
+      "birthday": "1989-04-28"
     },
     "Zach Line": {
-      "birth_month": "04"
+      "birthday": "1990-04-26"
     }
   }
 }

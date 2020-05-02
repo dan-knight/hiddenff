@@ -1,4 +1,4 @@
-from sqlalchemy import create_engine, Column, Integer, String, ForeignKey
+from sqlalchemy import create_engine, Column, Integer, String, Date, ForeignKey
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, relationship
 
@@ -21,9 +21,7 @@ class Player(Base):
     last = Column(String(32), nullable=False)
     position = Column(String(2))
     team = Column(String(50))
-    birth_year = Column(Integer, nullable=False)
-    birth_month = Column(Integer, nullable=False)
-    birth_day = Column(Integer, nullable=False)
+    birthday = Column(Date)
 
     player_games = relationship('PlayerGame', back_populates='player')
 
@@ -71,11 +69,11 @@ class Player(Base):
 
     @staticmethod
     def get(player_data):
+        # TODO Check player_data['birthday'] and convert to datetime object if needed.
+
         player = session.query(Player).filter_by(first=player_data['first'],
                                                  last=player_data['last'],
-                                                 birth_year=player_data['birth_year'],
-                                                 birth_month=player_data['birth_month'],
-                                                 birth_day=player_data['birth_day']).first()
+                                                 birthday=player_data['birthday']).first()
 
         return player
 

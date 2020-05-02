@@ -284,34 +284,25 @@ class PlayerPageScraper(RequestsScraper):
 
             return text
 
-        def get_birth_date():
-            year = ''
-            month = ''
-            day = ''
+        def get_birthday():
+            text = ''
 
             span = container.find('span', id='necro-birth')
 
             try:
                 text = span['data-birth']
-                split_text = text.split('-')
-                year = split_text[0]
-                month = split_text[1]
-                day = split_text[2]
-            except (TypeError, IndexError):
-                self.add_error('birth_date')
+            except TypeError:
+                self.add_error('birthday')
 
-            return year, month, day
+            return text
 
         first, last = get_name()
-        birth_year, birth_month, birth_day = get_birth_date()
 
         self.data.update({
             'first': first,
             'last': last,
             'team': get_team(),
-            'birth_year': birth_year,
-            'birth_month': birth_month,
-            'birth_day': birth_day
+            'birthday': get_birthday()
         })
 
     def scrape_game_stats(self, week=current_week):

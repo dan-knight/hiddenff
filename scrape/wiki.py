@@ -78,41 +78,24 @@ class PlayerPageScraper(RequestsScraper):
 
         self.data['team'] = team_text
 
-    def get_birthdate(self):
-        year = ''
-        month = ''
-        day = ''
+    def get_birthday(self):
+        text = ''
 
         try:
             th = self.card.find('th', text=re.compile('Born'))
             td = th.next_sibling
             span = td.find('span', attrs={'class': 'bday'})
-            birthdate_text = span.text
-
-            def split_birthdate():
-                split_date = ('', '', '')
-                split_text = birthdate_text.split('-')
-                try:
-                    split_date = (split_text[0], split_text[1], split_text[2])
-                except IndexError:
-                    self.add_error('birthdate')
-
-                return split_date
-
-            year, month, day = split_birthdate()
-
+            text = span.text
         except AttributeError:
-            self.add_error('birthdate')
+            self.add_error('birthday')
 
-        self.data['birth_year'] = year
-        self.data['birth_month'] = month
-        self.data['birth_day'] = day
+        self.data['birthday'] = text
 
 
 def scrape_player(link):
     scraper = PlayerPageScraper(link)
     scraper.get_team()
-    scraper.get_birthdate()
+    scraper.get_birthday()
     return scraper.data
 
 

@@ -10,7 +10,7 @@ from config import current_year, current_week
 
 import json
 import re
-from datetime import datetime
+import datetime as dt
 
 
 # Database
@@ -51,9 +51,7 @@ def scrape_player(guru_link):
             'last': guru_data['last'],
             'position': guru_data['position'],
             'team': pfr_data['team'],
-            'birth_year': pfr_data['birth_year'],
-            'birth_month': pfr_data['birth_month'],
-            'birth_day': pfr_data['birth_day'],
+            'birthday': pfr_data['birthday'],
             'games': pfr_data['games'],
         }
 
@@ -80,12 +78,7 @@ def scrape_player(guru_link):
                 for link in wiki_links:
                     wiki_data = wiki.scrape_player(link)
 
-                    def is_same_birthday():
-                        return wiki_data['birth_year'] == scraped_data['birth_year'] and \
-                               wiki_data['birth_month'] == scraped_data['birth_month'] and \
-                               wiki_data['birth_day'] == scraped_data['birth_day']
-
-                    if is_same_birthday():
+                    if wiki_data['birthday'] == scraped_data['birthday']:
                         def update_scraped_data():
                             for error in errors.copy():
                                 if wiki_data[error]:
@@ -180,7 +173,7 @@ def split_filename_type(filename, file_type):
 
 
 def get_timestamp():
-    return datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
+    return dt.datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
 
 
 def import_scrape(filename):
@@ -190,9 +183,7 @@ def import_scrape(filename):
 
 if __name__ == '__main__':
     guru_list_url = 'http://rotoguru1.com/cgi-bin/fstats.cgi?pos=0&sort=1&game=p&colA=0&daypt=0&xavg=0&inact=0&maxprc=99999&outcsv=0'
-    scrape_players_and_export(guru_list_url)
-
-    driver.close()
+    #scrape_players_and_export(guru_list_url)
 
     # db.reset_tables()
     # db.session.commit()
