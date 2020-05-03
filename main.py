@@ -189,8 +189,16 @@ if __name__ == '__main__':
     driver.close()
 
     db.reset_tables()
-    for game in import_scrape('game-scrape_2020-05-02_04-17-22.json')['games']:
-        print(game)
-        db.session.add(db.Game.new(game))
+    players = import_scrape('player-scrape_2020-05-01_18-03-11.json')['players']
+    for player in players[:15]:
+        db.Player.update(player)
+
+    for player in players:
+        db.Player.update(player)
+
+    games = import_scrape('game-scrape_2020-05-02_04-17-22.json')['games']
+    for game in games:
+        db.Game.update(game)
 
     db.session.commit()
+
