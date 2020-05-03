@@ -29,7 +29,7 @@ def scrape_player(guru_link):
     guru_data = guru.scrape_player(guru_link)
 
     def get_pfr_link():
-        link = pfr_player_list.get_player_link(guru_data['first'], guru_data['last'])
+        link = pfr.get_player_link(guru_data['first'], guru_data['last'])
 
         if not link:
             link = pfr.prepend_link(pfr.errors['player_links'].get(guru_link))
@@ -101,7 +101,7 @@ def scrape_games_and_export():
         links = []
 
         for week in range(1, current_week + 1):
-            links += pfr_game_list.get_week_links(week)
+            links += pfr.get_game_links(week)
 
         return links
 
@@ -153,13 +153,6 @@ def export_scrape(filename, data):
 
 
 # Utilities
-pfr_player_list_url = 'https://www.pro-football-reference.com/years/%s/fantasy.htm' % current_year
-pfr_player_list = pfr.PlayerListScraper(pfr_player_list_url)
-
-pfr_game_list_url = 'https://www.pro-football-reference.com/years/%s/games.htm' % current_year
-pfr_game_list = pfr.GameListScraper(pfr_game_list_url)
-
-
 def split_filename_type(filename, file_type):
     def format_type():
         return '.%s' % file_type if not file_type.startswith('.') else file_type
@@ -184,21 +177,7 @@ def import_scrape(filename):
 if __name__ == '__main__':
     guru_list_url = 'http://rotoguru1.com/cgi-bin/fstats.cgi?pos=0&sort=1&game=p&colA=0&daypt=0&xavg=0&inact=0&maxprc=99999&outcsv=0'
 
-
-    # scrape_games_and_export()
+    scrape_players_and_export(guru_list_url)
+    scrape_games_and_export()
     driver.close()
-
-    db.reset_tables()
-    players = import_scrape('player-scrape_2020-05-01_18-03-11.json')['players']
-    for player in players[:15]:
-        db.Player.update(player)
-
-    for player in players:
-        db.Player.update(player)
-
-    games = import_scrape('game-scrape_2020-05-02_04-17-22.json')['games']
-    for game in games:
-        db.Game.update(game)
-
-    db.session.commit()
 

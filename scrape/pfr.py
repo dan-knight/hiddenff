@@ -10,7 +10,8 @@ import json
 
 
 class GameListScraper(RequestsScraper):
-    def __init__(self, url):
+    def __init__(self, year=current_year):
+        url = 'https://www.pro-football-reference.com/years/%s/games.htm' % year
         super().__init__(url)
 
         def get_container():
@@ -37,7 +38,8 @@ class GameListScraper(RequestsScraper):
 
 
 class PlayerListScraper(RequestsScraper):
-    def __init__(self, url):
+    def __init__(self, year=current_year):
+        url = 'https://www.pro-football-reference.com/years/%s/fantasy.htm' % year
         super().__init__(url)
 
         def get_container():
@@ -46,10 +48,10 @@ class PlayerListScraper(RequestsScraper):
 
         self.container = get_container()
 
-    def get_player_link(self, first, last):
+    def get_link(self, first, last):
         full_name = ' '.join((first, last))
 
-        def get_link(name):
+        def scrape_list(name):
             link = ''
 
             def get_name_matches():
@@ -66,13 +68,13 @@ class PlayerListScraper(RequestsScraper):
                 error_name = errors['player_names'].get(full_name)
 
                 if error_name:
-                    link = get_link(error_name)
+                    link = scrape_list(error_name)
                 else:
                     link = prepend_link(errors['player_links'].get(full_name))
 
             return link
 
-        return get_link(full_name)
+        return scrape_list(full_name)
 
 
 class GamePageScraper(SeleniumScraper):
@@ -430,6 +432,30 @@ class PlayerPageScraper(RequestsScraper):
             pass
 
 
+def get_player_link(first, last):
+    global player_list_scraper
+
+    try:
+        link = player_list_scraper.get_link(first, last)
+    except AttributeError:
+        player_list_scraper = PlayerListScraper()
+        link = get_player_link(first, last)
+
+    return link
+
+
+def get_game_links(week):
+    global game_list_scraper
+
+    try:
+        links = game_list_scraper.get_week_links(week)
+    except AttributeError:
+        game_list_scraper = GameListScraper()
+        links = get_game_links(week)
+
+    return links
+
+
 def scrape_player(link, year=current_year, weeks=current_week):
     player = PlayerPageScraper(link, year)
     player.scrape_basic_info()
@@ -457,6 +483,10 @@ def scrape_game(link):
 # Utilities
 with open('./scrape/error/pfr.json') as file:
     errors = json.load(file)
+
+
+player_list_scraper = None
+game_list_scraper = None
 
 
 def prepend_link(link):
