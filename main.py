@@ -180,17 +180,16 @@ if __name__ == '__main__':
     players = import_scrape('player-scrape_2020-05-01_18-03-11.json')['players']
     games = import_scrape('game-scrape_2020-05-03_19-18-17.json')['games']
 
-    # db.reset_tables()
-    #
-    # for game in games:
-    #     print(game)
-    #     db.Game.update_from_scraped(game)
-    #
-    # for player in players:
-    #     db.Player.update_from_scraped(player)
+    db.reset_tables()
+
+    for game in games:
+        db.Game.update_from_scraped(game)
+
+    for player in players:
+        db.Player.update_from_scraped(player)
 
     print((db.TeamGame.get({'team': 'NE',
-                           'week': 1})))
+                              'week': 1})))
 
     db.session.commit()
 

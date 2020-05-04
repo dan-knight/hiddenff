@@ -137,7 +137,7 @@ class Player(HiddenFF, Base):
     first = Column(String(32), nullable=False)
     last = Column(String(32), nullable=False)
     position = Column(String(2))
-    team = Column(String(50))
+    team = Column(String(3))
     birthday = Column(Date)
 
     player_games = relationship('PlayerGame', back_populates='player')
@@ -149,20 +149,31 @@ class Player(HiddenFF, Base):
 
     @staticmethod
     def update_from_scraped(scraped_data):
+        team = team_keys[scraped_data['team']]
+
+        scraped_data.update({'team': team})
+
         db_player = Player.update(scraped_data)
 
         for game in scraped_data.get('games'):
-            game['player_id'] = db_player.id
+            team = team_keys[game['team']]
 
-            db_game = PlayerGame.update(game)
-            db_player.player_games.append(db_game)
+            game.update({'player_id': db_player.id,
+                         'team': team})
+
+            db_player_game = PlayerGame.update(game)
+            db_player.player_games.append(db_player_game)
+            db_team_game = TeamGame.get({'team': game['team'],
+                                         'week': game['week']})
+
+            db_team_game.player_games.append(db_player_game)
 
     @staticmethod
     def new(data):
         player = Player(first=data['first'],
                         last=data['last'],
                         position=data['position'],
-                        team=team_keys[data['team']],
+                        team=data['team'],
                         birthday=create_date(data['birthday']))
 
         return player
@@ -188,6 +199,7 @@ class TeamGame(HiddenFF, Base):
     snaps = Column(Integer)
 
     game = relationship('Game', back_populates='team_games')
+    player_games = relationship('PlayerGame', back_populates='team_game')
 
     modifiable_columns = {'score', 'handicap', 'total', 'snaps'}
 
@@ -208,14 +220,16 @@ class TeamGame(HiddenFF, Base):
 
         return game
 
+    def get_week(self):
+        return self.game.week
+
 
 class PlayerGame(HiddenFF, Base):
     __tablename__ = 'player_games'
 
     id = Column(Integer, primary_key=True)
     player_id = Column(Integer, ForeignKey('players.id'))
-    week = Column(Integer, nullable=False)
-    team = Column(String(3), nullable=False)
+    team_game_id = Column(Integer, ForeignKey('team_games.id'))
 
     rush_att = Column(Integer, nullable=False)
     rush_yd = Column(Integer, nullable=False)
@@ -237,6 +251,7 @@ class PlayerGame(HiddenFF, Base):
     snaps = Column(Integer, nullable=False)
 
     player = relationship('Player', back_populates='player_games')
+    team_game = relationship('TeamGame', back_populates='player_games')
 
     modifiable_columns = {
         'team',
@@ -252,9 +267,7 @@ class PlayerGame(HiddenFF, Base):
             scraped_stat = data[stat]
             return scraped_stat if scraped_stat else '0'
 
-        game = PlayerGame(week=data['week'],
-                          team=team_keys[data['team']],
-                          rush_att=check_stat('rush_att'),
+        game = PlayerGame(rush_att=check_stat('rush_att'),
                           rush_yd=check_stat('rush_yd'),
                           rush_td=check_stat('rush_td'),
                           tgt=check_stat('tgt'),
@@ -268,17 +281,23 @@ class PlayerGame(HiddenFF, Base):
                           fum=check_stat('fum'),
                           int=check_stat('int'),
                           sacked=check_stat('sacked'),
-                          snaps=data['snaps']
-                          )
+                          snaps=data['snaps'])
 
         return game
 
     @staticmethod
     def get(data):
-        game = session.query(PlayerGame).filter_by(player_id=data['player_id'],
-                                                   week=data['week']).first()
+        game = session.query(PlayerGame).filter_by(player_id=data['player_id'])\
+            .join(PlayerGame.team_game)\
+            .join(TeamGame.game, aliased=True, from_joinpoint=True).filter_by(week=data['week']).first()
 
         return game
+
+    def get_week(self):
+        return self.team_game.game.week
+
+    def get_team(self):
+        return self.team_game.team
 
 
 # Utilities
