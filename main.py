@@ -187,7 +187,6 @@ if __name__ == '__main__':
         db.Game.update_from_scraped(game)
 
     for player in players:
-        print(player)
         db.Player.update_from_scraped(player)
 
     db.session.commit()

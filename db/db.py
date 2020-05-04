@@ -57,6 +57,8 @@ class Game(HiddenFF, Base):
     roof = Column(Boolean)
     surface = Column(String(255))
 
+    team_games = relationship('TeamGame', back_populates='game')
+
     @staticmethod
     def update_from_scraped(scraped_data):
         db_game = Game.update(scraped_data)
@@ -99,7 +101,7 @@ class Game(HiddenFF, Base):
             return [parse_data(game) for game in scraped_data['team_games']]
 
         for team_game in parse_team_games():
-            TeamGame.update(team_game)
+            db_game.team_games.append(TeamGame.update(team_game))
 
     @staticmethod
     def new(scraped_data):
@@ -178,12 +180,15 @@ class TeamGame(HiddenFF, Base):
     __tablename__ = 'team_games'
 
     id = Column(Integer, primary_key=True)
+    game_id = Column(Integer, ForeignKey('games.id'))
     team = Column(String(3), nullable=False)
     week = Column(Integer)
     score = Column(Integer)
     handicap = Column(Float)
     total = Column(Float)
     snaps = Column(Integer)
+
+    game = relationship('Game', back_populates='team_games')
 
     modifiable_columns = {'score', 'handicap', 'total', 'snaps'}
 
