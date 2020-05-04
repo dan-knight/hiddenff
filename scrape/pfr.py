@@ -309,7 +309,7 @@ class GamePageScraper(SeleniumScraper):
 
                     return snaps
 
-                name = get_element_text(
+                team_name = get_element_text(
                         team_div.find('a', {'itemprop': 'name'}), 'name')
 
                 score = get_element_text(
@@ -318,7 +318,7 @@ class GamePageScraper(SeleniumScraper):
                 snaps = get_snaps()
 
                 return {
-                    'name': name,
+                    'team': team_name,
                     'score': score,
                     'snaps': snaps
                 }

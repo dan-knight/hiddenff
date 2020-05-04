@@ -1,7 +1,7 @@
 from scrape import pfr
 from scrape import guru
 from scrape import wiki
-from scrape.base import driver
+from scrape.base import close_driver
 
 from db import db
 
@@ -175,9 +175,22 @@ def import_scrape(filename):
 
 
 if __name__ == '__main__':
-    guru_list_url = 'http://rotoguru1.com/cgi-bin/fstats.cgi?pos=0&sort=1&game=p&colA=0&daypt=0&xavg=0&inact=0&maxprc=99999&outcsv=0'
+    #guru_list_url = 'http://rotoguru1.com/cgi-bin/fstats.cgi?pos=0&sort=1&game=p&colA=0&daypt=0&xavg=0&inact=0&maxprc=99999&outcsv=0'
 
-    scrape_players_and_export(guru_list_url)
-    scrape_games_and_export()
-    driver.close()
+    players = import_scrape('player-scrape_2020-05-01_18-03-11.json')['players']
+    games = import_scrape('game-scrape_2020-05-03_19-18-17.json')['games']
+
+    db.reset_tables()
+
+    for game in games:
+        print(game)
+        db.Game.update_from_scraped(game)
+
+    for player in players:
+        print(player)
+        db.Player.update_from_scraped(player)
+
+    db.session.commit()
+
+
 

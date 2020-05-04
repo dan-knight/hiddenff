@@ -58,6 +58,50 @@ class Game(HiddenFF, Base):
     surface = Column(String(255))
 
     @staticmethod
+    def update_from_scraped(scraped_data):
+        db_game = Game.update(scraped_data)
+
+        def parse_spread():
+            split_text = scraped_data['spread'].rsplit(' ', 1)
+            return split_text[0], float(split_text[1])
+
+        favorite, spread = parse_spread()
+
+        over_under = float(scraped_data['over_under'].split(' ', 1)[0])
+        split_total = over_under / 2
+
+        def parse_team_games():
+            def parse_data(scraped_team_game):
+                team = team_keys[scraped_team_game['team']]
+
+                is_favorite = team == team_keys[favorite]
+
+                def get_handicap():
+                    return spread if is_favorite else spread * -1
+
+                handicap = get_handicap()
+
+                def get_total():
+                    return split_total - (handicap / 2)
+
+                team_game = {
+                    'team': team,
+                    'score': scraped_team_game['score'],
+                    'handicap': get_handicap(),
+                    'total': get_total(),
+                    'snaps': scraped_team_game['snaps'],
+                    'game_id': db_game.id,
+                    'week': db_game.week
+                }
+
+                return team_game
+
+            return [parse_data(game) for game in scraped_data['team_games']]
+
+        for team_game in parse_team_games():
+            TeamGame.update(team_game)
+
+    @staticmethod
     def new(scraped_data):
         def parse_length():
             split_text = scraped_data['length'].split(':')
@@ -101,12 +145,13 @@ class Player(HiddenFF, Base):
 
     modifiable_columns = {'position', 'team'}
 
-    @classmethod
-    def update(cls, data):
-        db_player = super().update(data)
+    @staticmethod
+    def update_from_scraped(scraped_data):
+        db_player = Player.update(scraped_data)
 
-        for game in data.get('games'):
+        for game in scraped_data.get('games'):
             game['player_id'] = db_player.id
+
             db_game = PlayerGame.update(game)
             db_player.player_games.append(db_game)
 
@@ -127,6 +172,38 @@ class Player(HiddenFF, Base):
                                                  birthday=data['birthday']).first()
 
         return player
+
+
+class TeamGame(HiddenFF, Base):
+    __tablename__ = 'team_games'
+
+    id = Column(Integer, primary_key=True)
+    team = Column(String(3), nullable=False)
+    week = Column(Integer)
+    score = Column(Integer)
+    handicap = Column(Float)
+    total = Column(Float)
+    snaps = Column(Integer)
+
+    modifiable_columns = {'score', 'handicap', 'total', 'snaps'}
+
+    @staticmethod
+    def new(data):
+        game = TeamGame(team=data['team'],
+                        week=data['week'],
+                        score=data['score'],
+                        handicap=data['handicap'],
+                        total=data['total'],
+                        snaps=data['snaps'])
+
+        return game
+
+    @staticmethod
+    def get(data):
+        game = session.query(TeamGame).filter_by(week=data['week'],
+                                                 team=data['team']).first()
+
+        return game
 
 
 class PlayerGame(HiddenFF, Base):

@@ -44,8 +44,17 @@ class SeleniumScraper(Scraper):
         super(SeleniumScraper, self).__init__(url)
 
     def get_html(self):
-        self.setup_page()
-        return driver.page_source
+        global driver
+
+        try:
+            self.setup_page()
+            html = driver.page_source
+        except AttributeError:
+            driver = webdriver.Firefox()
+            html = self.get_html()
+
+        return html
+
 
     def setup_page(self):
         try:
@@ -85,10 +94,17 @@ class SeleniumScraper(Scraper):
         driver.execute_script("arguments[0].click();", element)
 
 
-driver = webdriver.Firefox()
+driver = None
 
 
 def restart_driver():
     global driver
     driver.close()
     driver = webdriver.Firefox()
+
+
+def close_driver():
+    try:
+        driver.close()
+    except AttributeError:
+        pass
