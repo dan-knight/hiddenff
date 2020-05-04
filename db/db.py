@@ -182,7 +182,6 @@ class TeamGame(HiddenFF, Base):
     id = Column(Integer, primary_key=True)
     game_id = Column(Integer, ForeignKey('games.id'))
     team = Column(String(3), nullable=False)
-    week = Column(Integer)
     score = Column(Integer)
     handicap = Column(Float)
     total = Column(Float)
@@ -195,7 +194,6 @@ class TeamGame(HiddenFF, Base):
     @staticmethod
     def new(data):
         game = TeamGame(team=data['team'],
-                        week=data['week'],
                         score=data['score'],
                         handicap=data['handicap'],
                         total=data['total'],
@@ -205,8 +203,8 @@ class TeamGame(HiddenFF, Base):
 
     @staticmethod
     def get(data):
-        game = session.query(TeamGame).filter_by(week=data['week'],
-                                                 team=data['team']).first()
+        game = session.query(TeamGame).filter_by(team=data['team']).\
+            join(TeamGame.game).filter_by(week=data['week']).first()
 
         return game
 
