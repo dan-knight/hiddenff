@@ -69,9 +69,6 @@ def get_team_keys():
 team_keys = get_team_keys()
 
 
-
-
-
 def get_month_keys():
     months = {}
     months.update(dict.fromkeys(['Sep'], '09'))

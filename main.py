@@ -68,7 +68,7 @@ def scrape_player(guru_link):
         def check_errors():
             def combine_errors():
                 all_errors = guru_data['errors']
-                all_errors.update(pfr_data['errors'])
+                all_errors.replace(pfr_data['errors'])
                 return all_errors
 
             errors = combine_errors()
@@ -182,16 +182,18 @@ if __name__ == '__main__':
 
     db.reset_tables()
 
+    for team in import_scrape('teams'):
+        db.Team.replace(team)
+
     for game in games:
         db.Game.update_from_scraped(game)
 
     for player in players:
         db.Player.update_from_scraped(player)
 
-    print((db.TeamGame.get({'team': 'NE',
-                              'week': 1})))
-
     db.session.commit()
+
+
 
 
 

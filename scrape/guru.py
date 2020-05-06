@@ -67,7 +67,7 @@ class PlayerPageScraper(RequestsScraper):
 
         first, last = get_name()
 
-        self.data.update({
+        self.data.replace({
             'first': first,
             'last': last,
             'position': get_position()

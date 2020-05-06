@@ -21,7 +21,7 @@ class HiddenFF:
         super().__init__(*args, **kwargs)
 
     @classmethod
-    def update(cls, data):
+    def replace(cls, data):
         db_row = cls.get(data)
 
         if not db_row:
@@ -50,7 +50,7 @@ class Game(HiddenFF, Base):
     __tablename__ = 'games'
 
     id = Column(Integer, primary_key=True)
-    week = Column(Integer)
+    week = Column(Integer, nullable=False)
     start = Column(DateTime, nullable=False)
     length = Column(Integer)
     stadium = Column(String(255), nullable=False)
@@ -61,7 +61,7 @@ class Game(HiddenFF, Base):
 
     @staticmethod
     def update_from_scraped(scraped_data):
-        db_game = Game.update(scraped_data)
+        db_game = Game.replace(scraped_data)
 
         def parse_spread():
             split_text = scraped_data['spread'].rsplit(' ', 1)
@@ -101,7 +101,11 @@ class Game(HiddenFF, Base):
             return [parse_data(game) for game in scraped_data['team_games']]
 
         for team_game in parse_team_games():
-            db_game.team_games.append(TeamGame.update(team_game))
+            db_team_game = TeamGame.replace(team_game)
+            db_game.team_games.append(db_team_game)
+
+            db_team = Team.get_from_cache(team_game['team'])
+            db_team.team_games.append(db_team_game)
 
     @staticmethod
     def new(scraped_data):
@@ -130,6 +134,42 @@ class Game(HiddenFF, Base):
         return game
 
 
+class Team(HiddenFF, Base):
+    __tablename__ = 'teams'
+
+    short = Column(String(3), primary_key=True)
+    city = Column(String(255), nullable=False)
+    mascot = Column(String(255), nullable=False)
+
+    players = relationship('Player', back_populates='team')
+    team_games = relationship('TeamGame', back_populates='team')
+
+    cache = {}
+
+    @staticmethod
+    def new(data):
+        team = Team(short=data['short'],
+                    city=data['city'],
+                    mascot=data['mascot'])
+
+        return team
+
+    @staticmethod
+    def get(data):
+        team = session.query(Team).filter_by(short=data['short']).first()
+        return team
+
+    @staticmethod
+    def get_from_cache(team_id):
+        try:
+            db_team = Team.cache[team_id]
+        except KeyError:
+            db_team = Team.get({'short': team_id})
+            Team.cache[team_id] = db_team
+
+        return db_team
+
+
 class Player(HiddenFF, Base):
     __tablename__ = 'players'
 
@@ -137,15 +177,16 @@ class Player(HiddenFF, Base):
     first = Column(String(32), nullable=False)
     last = Column(String(32), nullable=False)
     position = Column(String(2))
-    team = Column(String(3))
+    team_id = Column(String(3), ForeignKey('teams.short'))
     birthday = Column(Date)
 
+    team = relationship('Team', back_populates='players')
     player_games = relationship('PlayerGame', back_populates='player')
 
     def __repr__(self):
         return '%s %s (%s): %s' % (self.first, self.last, self.position, self.team)
 
-    modifiable_columns = {'position', 'team'}
+    modifiable_columns = {'position', 'team_id'}
 
     @staticmethod
     def update_from_scraped(scraped_data):
@@ -153,7 +194,11 @@ class Player(HiddenFF, Base):
 
         scraped_data.update({'team': team})
 
-        db_player = Player.update(scraped_data)
+        db_player = Player.replace(scraped_data)
+
+        if team:
+            db_team = Team.get_from_cache(team)
+            db_team.players.append(db_player)
 
         for game in scraped_data.get('games'):
             team = team_keys[game['team']]
@@ -161,7 +206,7 @@ class Player(HiddenFF, Base):
             game.update({'player_id': db_player.id,
                          'team': team})
 
-            db_player_game = PlayerGame.update(game)
+            db_player_game = PlayerGame.replace(game)
             db_player.player_games.append(db_player_game)
             db_team_game = TeamGame.get({'team': game['team'],
                                          'week': game['week']})
@@ -173,7 +218,6 @@ class Player(HiddenFF, Base):
         player = Player(first=data['first'],
                         last=data['last'],
                         position=data['position'],
-                        team=data['team'],
                         birthday=create_date(data['birthday']))
 
         return player
@@ -192,12 +236,13 @@ class TeamGame(HiddenFF, Base):
 
     id = Column(Integer, primary_key=True)
     game_id = Column(Integer, ForeignKey('games.id'))
-    team = Column(String(3), nullable=False)
+    team_id = Column(String(3), ForeignKey('teams.short'))
     score = Column(Integer)
     handicap = Column(Float)
     total = Column(Float)
     snaps = Column(Integer)
 
+    team = relationship('Team', back_populates='team_games')
     game = relationship('Game', back_populates='team_games')
     player_games = relationship('PlayerGame', back_populates='team_game')
 
@@ -205,8 +250,7 @@ class TeamGame(HiddenFF, Base):
 
     @staticmethod
     def new(data):
-        game = TeamGame(team=data['team'],
-                        score=data['score'],
+        game = TeamGame(score=data['score'],
                         handicap=data['handicap'],
                         total=data['total'],
                         snaps=data['snaps'])
@@ -215,7 +259,7 @@ class TeamGame(HiddenFF, Base):
 
     @staticmethod
     def get(data):
-        game = session.query(TeamGame).filter_by(team=data['team']).\
+        game = session.query(TeamGame).join(TeamGame.team).filter_by(short=data['team']).\
             join(TeamGame.game).filter_by(week=data['week']).first()
 
         return game

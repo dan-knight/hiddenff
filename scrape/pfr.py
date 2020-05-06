@@ -234,7 +234,7 @@ class GamePageScraper(SeleniumScraper):
 
         roof, surface, spread, over_under = scrape_game_info()
 
-        self.data.update({
+        self.data.replace({
             'week': get_week(),
             'start': start,
             'stadium': stadium,
@@ -325,7 +325,7 @@ class GamePageScraper(SeleniumScraper):
 
             teams.append(scrape_team())
 
-        self.data.update({'team_games': teams})
+        self.data.replace({'team_games': teams})
 
 
 class PlayerPageScraper(RequestsScraper):
@@ -382,7 +382,7 @@ class PlayerPageScraper(RequestsScraper):
 
         first, last = get_name()
 
-        self.data.update({
+        self.data.replace({
             'first': first,
             'last': last,
             'team': get_team(),
