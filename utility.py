@@ -61,7 +61,7 @@ def get_team_keys():
     teams.update(dict.fromkeys(['Tampa Bay Buccaneers', 'TB', 'TAM'], 'TB'))
     teams.update(dict.fromkeys(['Tennessee Titans', 'TEN'], 'TEN'))
     teams.update(dict.fromkeys(['Washington Redskins', 'WAS'], 'WAS'))
-    teams.update(dict.fromkeys(['Free agent', ''], ''))
+    teams.update(dict.fromkeys(['Free agent', ''], None))
 
     return teams
 
