@@ -183,35 +183,10 @@ if __name__ == '__main__':
 
     db.reset_tables()
 
-    def update_from_scraped(scraped_teams, scraped_games, scraped_players):
-        for team in scraped_teams:
-            db.Team.replace(team)
-
-        for game in scraped_games:
-            db.Game.update_from_scraped(game)
-
-        for player in scraped_players:
-            db.Player.update_from_scraped(player)
-
-        db.session.commit()
-
-    def calculate_stats():
-        for game in db.session.query(db.Game).all():
-            game.calculate_stats()
-
-        for team_game in db.session.query(db.TeamGame).all():
-            team_game.calculate_stats()
-
-        for player in db.session.query(db.Player).all():
-            player.calculate_stats()
-
-        for player_game in db.session.query(db.PlayerGame).all():
-            player_game.calculate_stats()
-
-        db.session.commit()
-
-    update_from_scraped(teams, games, players)
-    calculate_stats()
+    db.update_from_scraped({'teams': teams,
+                            'games': games,
+                            'players': players})
+    db.calculate_stats()
 
     db.session.commit()
 
