@@ -179,19 +179,44 @@ if __name__ == '__main__':
 
     players = import_scrape('player-scrape_2020-05-01_18-03-11.json')['players']
     games = import_scrape('game-scrape_2020-05-03_19-18-17.json')['games']
+    teams = import_scrape('teams')
 
     db.reset_tables()
 
-    for team in import_scrape('teams'):
-        db.Team.replace(team)
+    def update_from_scraped(scraped_teams, scraped_games, scraped_players):
+        for team in scraped_teams:
+            db.Team.replace(team)
 
-    for game in games:
-        db.Game.update_from_scraped(game)
+        for game in scraped_games:
+            db.Game.update_from_scraped(game)
 
-    for player in players:
-        db.Player.update_from_scraped(player)
+        for player in scraped_players:
+            db.Player.update_from_scraped(player)
+
+        db.session.commit()
+
+    def calculate_stats():
+        for game in db.session.query(db.Game).all():
+            game.calculate_stats()
+
+        for team_game in db.session.query(db.TeamGame).all():
+            team_game.calculate_stats()
+
+        for player in db.session.query(db.Player).all():
+            player.calculate_stats()
+
+        for player_game in db.session.query(db.PlayerGame).all():
+            player_game.calculate_stats()
+
+        db.session.commit()
+
+    update_from_scraped(teams, games, players)
+    calculate_stats()
 
     db.session.commit()
+
+
+
 
 
 
