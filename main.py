@@ -186,6 +186,7 @@ if __name__ == '__main__':
     db.update_from_scraped({'teams': teams,
                             'games': games,
                             'players': players})
+
     db.calculate_stats()
 
     db.session.commit()
