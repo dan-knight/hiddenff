@@ -8,6 +8,28 @@ import json
 import re
 
 
+class StadiumListScraper(RequestsScraper):
+    def __init__(self, url):
+        super().__init__(url)
+
+        def get_container():
+            mw_pages = self.soup.find('div', id='mw-pages')
+            return mw_pages.find('div', attrs={'class': 'mw-category'})
+
+        self.container = get_container()
+
+    def get_link(self, name):
+        link = ''
+
+        try:
+            a = self.container.find('a', text=name)
+            link = prepend_link(a['href'])
+        except TypeError:
+            pass
+
+        return link
+
+
 class PlayerListScraper(SeleniumScraper):
     def __init__(self, url):
         super().__init__(url)
@@ -92,11 +114,24 @@ class PlayerPageScraper(RequestsScraper):
         self.data['birthday'] = text
 
 
-def scrape_player(link):
-    scraper = PlayerPageScraper(link)
-    scraper.get_team()
-    scraper.get_birthday()
-    return scraper.data
+def get_stadium_link(name):
+    global current_stadium_list_scraper
+
+    try:
+        link = current_stadium_list_scraper.get_link(name)
+    except AttributeError:
+        current_stadium_list_scraper = StadiumListScraper('https://en.wikipedia.org/wiki/Category:National_Football_League_venues')
+        link = get_stadium_link(name)
+
+    if not link:
+        try:
+            global former_stadium_list_scraper
+            link = former_stadium_list_scraper.get_link(name)
+        except AttributeError:
+            former_stadium_list_scraper = StadiumListScraper('https://en.wikipedia.org/wiki/Category:Defunct_National_Football_League_venues')
+            link = former_stadium_list_scraper.get_link(name)
+
+    return link
 
 
 def get_player_links(first, last, position):
@@ -169,7 +204,17 @@ def get_player_links(first, last, position):
     return links
 
 
+def scrape_player(link):
+    scraper = PlayerPageScraper(link)
+    scraper.get_team()
+    scraper.get_birthday()
+    return scraper.data
+
+
 # Utilities
+current_stadium_list_scraper = None
+former_stadium_list_scraper = None
+
 with open('./scrape/error/wiki.json') as file:
     errors = json.load(file)
 

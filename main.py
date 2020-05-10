@@ -191,6 +191,8 @@ if __name__ == '__main__':
     #
     # db.session.commit()
 
+    print(wiki.get_stadium_link('Harvard Stadium'))
+
 
 
 

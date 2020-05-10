@@ -352,7 +352,7 @@ class StadiumPageScraper(RequestsScraper):
             try:
                 data = [parse_entry(entry) for entry in get_entries()]
             except (AttributeError, IndexError):
-                pass
+                self.add_error(stat_name)
 
             return data
 
@@ -369,7 +369,7 @@ class StadiumPageScraper(RequestsScraper):
                         h1 = container.find('h1', {'itemprop': 'name'})
                         name = h1.text.split(' History', 1)[0]
                     except AttributeError:
-                        pass
+                        self.add_error('names')
 
                     return name
 
@@ -547,12 +547,11 @@ def scrape_game(link):
 
 
 # Utilities
-with open('./scrape/error/pfr.json') as file:
-    errors = json.load(file)
-
-
 player_list_scraper = None
 game_list_scraper = None
+
+with open('./scrape/error/pfr.json') as file:
+    errors = json.load(file)
 
 
 def prepend_link(link):
