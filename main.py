@@ -191,6 +191,18 @@ if __name__ == '__main__':
 
     db.session.commit()
 
+    # scrape = pfr.StadiumPageScraper('https://www.pro-football-reference.com/stadiums/BOS00.htm')
+    # container = scrape.soup.find('div', id='meta')
+    # p = container.find('b', text=re.compile('Surfaces'))
+    # text = p.next_sibling.strip()
+    # time_periods = text.split(', ')
+    #
+    # for time_period in time_periods:
+    #     def parse_time_period():
+    #         pass
+
+
+
 
 
 

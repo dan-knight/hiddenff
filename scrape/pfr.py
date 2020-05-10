@@ -328,6 +328,10 @@ class GamePageScraper(SeleniumScraper):
         self.data.replace({'team_games': teams})
 
 
+class StadiumPageScraper(RequestsScraper):
+    pass
+
+
 class PlayerPageScraper(RequestsScraper):
     def __init__(self, url, year=current_year):
         self.year = year
