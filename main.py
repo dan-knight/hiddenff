@@ -177,29 +177,20 @@ def import_scrape(filename):
 if __name__ == '__main__':
     #guru_list_url = 'http://rotoguru1.com/cgi-bin/fstats.cgi?pos=0&sort=1&game=p&colA=0&daypt=0&xavg=0&inact=0&maxprc=99999&outcsv=0'
 
-    players = import_scrape('player-scrape_2020-05-01_18-03-11.json')['players']
-    games = import_scrape('game-scrape_2020-05-03_19-18-17.json')['games']
-    teams = import_scrape('teams')
-
-    db.reset_tables()
-
-    db.update_from_scraped({'teams': teams,
-                            'games': games,
-                            'players': players})
-
-    db.calculate_stats()
-
-    db.session.commit()
-
-    # scrape = pfr.StadiumPageScraper('https://www.pro-football-reference.com/stadiums/BOS00.htm')
-    # container = scrape.soup.find('div', id='meta')
-    # p = container.find('b', text=re.compile('Surfaces'))
-    # text = p.next_sibling.strip()
-    # time_periods = text.split(', ')
+    # players = import_scrape('player-scrape_2020-05-01_18-03-11.json')['players']
+    # games = import_scrape('game-scrape_2020-05-03_19-18-17.json')['games']
+    # teams = import_scrape('teams')
     #
-    # for time_period in time_periods:
-    #     def parse_time_period():
-    #         pass
+    # db.reset_tables()
+    #
+    # db.update_from_scraped({'teams': teams,
+    #                         'games': games,
+    #                         'players': players})
+    #
+    # db.calculate_stats()
+    #
+    # db.session.commit()
+
 
 
 

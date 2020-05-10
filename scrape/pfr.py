@@ -331,6 +331,68 @@ class GamePageScraper(SeleniumScraper):
 class StadiumPageScraper(RequestsScraper):
     pass
 
+    def scrape_basic_info(self):
+        container = self.soup.find('div', id='meta')
+
+        def scrape_row(label, stat_name):
+            data = []
+
+            def get_entries():
+                p = container.find('b', text=re.compile(label))
+                text = p.next_sibling.strip()
+                return text.split(', ')
+
+            def parse_entry(entry):
+                split_text = entry.split(' (')
+                surface_text = split_text[0].strip()
+                years_text = split_text[1].strip(')').split('-')
+                return {stat_name: surface_text,
+                        'seasons': years_text}
+
+            try:
+                data = [parse_entry(entry) for entry in get_entries()]
+            except (AttributeError, IndexError):
+                pass
+
+            return data
+
+        def get_names():
+            stat_name = 'name'
+
+            names = scrape_row('Known As', stat_name)
+
+            if not names:
+                def get_title_name():
+                    name = ''
+
+                    try:
+                        h1 = container.find('h1', {'itemprop': 'name'})
+                        name = h1.text.split(' History', 1)[0]
+                    except AttributeError:
+                        pass
+
+                    return name
+
+                def get_years_active():
+                    years = []
+                    try:
+                        p = container.find('b', text=re.compile('Years Active'))
+                        text = p.next_sibling
+                        years_text = text.split('(')[0].strip()
+                        years = years_text.split('-')
+                    except AttributeError:
+                        pass
+
+                    return years
+
+                names = [{stat_name: get_title_name(),
+                          'seasons': get_years_active()}]
+
+            return names
+
+        self.data['names'] = get_names()
+        self.data['surfaces'] = scrape_row('Surfaces', 'surface')
+
 
 class PlayerPageScraper(RequestsScraper):
     def __init__(self, url, year=current_year):

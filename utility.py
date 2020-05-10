@@ -93,3 +93,16 @@ def get_roof_keys():
 
 
 roof_keys = get_roof_keys()
+
+
+def get_surface_keys():
+    surfaces = {}
+    surfaces.update(dict.fromkeys(['texasturf', 'astroturf', 'matrixturf', 'polyturf',
+                                   'dessograss', 'tartanturf', 'sportturf', 'fieldturf',
+                                   'astroplay', 'a_turf'], 'turf'))
+    surfaces.update(dict.fromkeys(['grass', 'dirt'], 'grass'))
+
+    return surfaces
+
+
+surface_keys = get_surface_keys()
