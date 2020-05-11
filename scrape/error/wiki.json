@@ -19,5 +19,12 @@
   },
   "player_links": {
     "Chester Rogers": "https://en.wikipedia.org/wiki/Chester_Rogers"
+  },
+  "stadium_names": {
+    "Tottenham Stadium": "Tottenham Hotspur Stadium",
+    "Azteca Stadium": "Estadio Azteca",
+    "StubHub Center": "Dignity Health Sports Park",
+    "TIAA Bank Stadium": "TIAA Bank Field",
+    "Ring Central Coliseum": "Oakland Coliseum"
   }
 }

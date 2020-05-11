@@ -3,6 +3,7 @@ from scrape.base import RequestsScraper, SeleniumScraper, driver
 from selenium.webdriver.support import expected_conditions as cond
 from selenium.webdriver.common.by import By
 from selenium.common.exceptions import TimeoutException
+from bs4.element import NavigableString
 
 import json
 import re
@@ -84,6 +85,68 @@ class PlayerListScraper(SeleniumScraper):
         return last >= last_player
 
 
+class StadiumPageScraper(RequestsScraper):
+    def __init__(self, url):
+        super().__init__(url)
+        self.vcard = self.soup.find('table', attrs={'class': 'vcard'})
+
+    def scrape_basic_info(self):
+        def get_teams():
+            def get_team_rows():
+                def get_container():
+                    th = self.vcard.find('th', text=re.compile('Tenants'))
+                    return th.parent.next_sibling
+
+                return get_container.find_all('a', {'title': 'National Football League'})
+
+            def get_team(nfl_link):
+                def get_team_name():
+                    team_link = nfl_link.find_previous_sibling('a', text=lambda x: not x == 'AFL')
+
+                    if not team_link and nfl_link.parent.name == 'span':
+                        team_link = nfl_link.parent.find_previous_sibling('a')
+
+                    return team_link.text
+
+                def get_years():
+                    years_text = ''
+
+                    def get_element_text(element):
+                        element_text = ''
+
+                        if isinstance(element, NavigableString):
+                            element_text = element
+                        elif element.name == 'a':
+                            element_text = element.text
+                        elif element.name == 'sup':
+                            for child in element.contents:
+                                element_text += get_element_text(child)
+
+                        return element_text
+
+                    for sibling in nfl_link.next_siblings:
+                        if sibling.name == 'br':
+                            break
+
+                        years_text += get_element_text(sibling)
+
+                    return years_text
+
+                return {'team': get_team_name(),
+                        'years': get_years()}
+
+            team_data = []
+
+            try:
+                team_data = [get_team(link) for link in get_team_rows()]
+            except AttributeError:
+                self.add_error('teams')
+
+            return team_data
+
+        self.data.update({'teams': get_teams()})
+
+
 class PlayerPageScraper(RequestsScraper):
     def __init__(self, url):
         super().__init__(url)
@@ -132,6 +195,12 @@ def get_stadium_link(name):
             link = former_stadium_list_scraper.get_link(name)
 
     return link
+
+
+def scrape_stadium(link):
+    scraper = StadiumPageScraper(link)
+    scraper.scrape_basic_info()
+    return scraper.data
 
 
 def get_player_links(first, last, position):

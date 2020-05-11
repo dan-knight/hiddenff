@@ -128,9 +128,33 @@ def scrape_stadiums_and_export(pfr_links):
 
 
 def scrape_stadium(pfr_link):
-    pfr_stadium = pfr.scrape_stadium(pfr_link)
-    pfr_stadium['errors'] = list(pfr_stadium['errors'])
-    return pfr_stadium
+    pfr_data = pfr.scrape_stadium(pfr_link)
+
+    errors = pfr_data['errors'].copy()
+
+    def get_most_recent_name():
+        name = pfr_data['names'][-1]['name']
+        try:
+            name = wiki.errors['stadium_names'][name]
+        except KeyError:
+            pass
+
+        return name
+
+    most_recent_name = get_most_recent_name()
+    wiki_link = wiki.get_stadium_link(most_recent_name)
+
+    wiki_data = {}
+
+    if wiki_link:
+        wiki_data = wiki.scrape_stadium(wiki_link)
+        pass
+    else:
+        errors.add('wiki_link')
+
+    return {'names': pfr_data['names'],
+            'surfaces': pfr_data['surfaces'],
+            'errors': list(errors)}
 
 
 def get_scraped_errors(filename):
@@ -213,9 +237,13 @@ if __name__ == '__main__':
     #
     # db.session.commit()
 
-    # stadium_links = get_scraped_stadium_links_from_games('game-scrape_2020-05-10_20-00-37.json')
+    stadium_links = get_scraped_stadium_links_from_games('game-scrape_2020-05-10_20-00-37.json')
+
+    for link in stadium_links:
+        scrape_stadium(link)
+
     # scrape_stadiums_and_export(stadium_links)
-    stadiums = import_scrape('stadium-scrape_2020-05-10_21-09-35.json')['stadiums']
+    # stadiums = import_scrape('stadium-scrape_2020-05-10_21-09-35.json')['stadiums']
 
     # def get_value(data, stat_name):
     #     value = ''

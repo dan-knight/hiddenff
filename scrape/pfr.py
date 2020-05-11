@@ -369,6 +369,7 @@ class StadiumPageScraper(RequestsScraper):
                     try:
                         h1 = container.find('h1', {'itemprop': 'name'})
                         name = h1.text.split(' History', 1)[0]
+                        self.data['errors'].remove('name')
                     except AttributeError:
                         self.add_error('names')
 
