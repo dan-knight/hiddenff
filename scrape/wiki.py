@@ -220,7 +220,6 @@ def get_stadium_link(name):
 def scrape_stadium(link):
     scraper = StadiumPageScraper(link)
     scraper.scrape_basic_info()
-    print(scraper.data)
     return scraper.data
 
 
