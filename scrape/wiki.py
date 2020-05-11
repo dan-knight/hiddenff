@@ -97,7 +97,7 @@ class StadiumPageScraper(RequestsScraper):
                     th = self.vcard.find('th', text=re.compile('Tenants'))
                     return th.parent.next_sibling
 
-                return get_container.find_all('a', {'title': 'National Football League'})
+                return get_container().find_all('a', {'title': 'National Football League'})
 
             def get_team(nfl_link):
                 def get_team_name():
@@ -109,28 +109,48 @@ class StadiumPageScraper(RequestsScraper):
                     return team_link.text
 
                 def get_years():
-                    years_text = ''
+                    years = ''
 
-                    def get_element_text(element):
-                        element_text = ''
+                    def get_text():
+                        text = ''
 
-                        if isinstance(element, NavigableString):
-                            element_text = element
-                        elif element.name == 'a':
-                            element_text = element.text
-                        elif element.name == 'sup':
-                            for child in element.contents:
-                                element_text += get_element_text(child)
+                        def get_element_text(element):
+                            element_text = ''
 
-                        return element_text
+                            if isinstance(element, NavigableString):
+                                element_text = element
+                            elif element.name == 'a':
+                                element_text = element.text
+                            elif element.name == 'sup':
+                                for child in element.contents:
+                                    element_text += get_element_text(child)
 
-                    for sibling in nfl_link.next_siblings:
-                        if sibling.name == 'br':
-                            break
+                            return element_text
 
-                        years_text += get_element_text(sibling)
+                        for sibling in nfl_link.next_siblings:
+                            if sibling.name == 'br':
+                                break
 
-                    return years_text
+                            text += get_element_text(sibling)
+
+                        return text
+
+                    def parse_text(years_text):
+                        def get_year_pairs():
+                            def format_text():
+                                text = years_text.split(') ', 1)[1].strip()
+                                return text.strip('(').strip(')')
+
+                            return format_text().split(', ')
+
+                        return [pair.split('–') for pair in get_year_pairs()]
+
+                    try:
+                        years = parse_text(get_text())
+                    except IndexError:
+                        self.add_error('years')
+
+                    return years
 
                 return {'team': get_team_name(),
                         'years': get_years()}
@@ -200,6 +220,7 @@ def get_stadium_link(name):
 def scrape_stadium(link):
     scraper = StadiumPageScraper(link)
     scraper.scrape_basic_info()
+    print(scraper.data)
     return scraper.data
 
 
