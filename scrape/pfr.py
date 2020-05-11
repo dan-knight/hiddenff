@@ -120,8 +120,6 @@ class GamePageScraper(SeleniumScraper):
 
                 return text
 
-
-
             def get_start():
                 start = ''
 
@@ -196,25 +194,27 @@ class GamePageScraper(SeleniumScraper):
                 return start
 
             def get_stadium():
-                text = ''
+                name = ''
+                link = ''
 
                 try:
                     strong = meta_div.find('strong', text=re.compile('Stadium'))
                     div = strong.parent
                     a = div.find('a')
-                    text = a.text
-                except AttributeError:
+                    name = a.text
+                    link = prepend_link(a['href'])
+                except (AttributeError, KeyError):
                     self.add_error('stadium')
 
-                return text
+                return name, link
 
             start_text = get_start()
-            stadium_text = get_stadium()
+            stadium_name_text, stadium_link_text = get_stadium()
             length_text = get_meta_text('Time of Game')
 
-            return start_text, stadium_text, length_text
+            return start_text, stadium_name_text, stadium_link_text, length_text
 
-        start, stadium, length = scrape_scorebox()
+        start, stadium_name, stadium_link, length = scrape_scorebox()
 
         def scrape_game_info():
             div = self.soup.find('table', id='game_info')
@@ -234,10 +234,11 @@ class GamePageScraper(SeleniumScraper):
 
         roof, surface, spread, over_under = scrape_game_info()
 
-        self.data.replace({
+        self.data.update({
             'week': get_week(),
             'start': start,
-            'stadium': stadium,
+            'stadium_name': stadium_name,
+            'stadium_link': stadium_link,
             'length': length,
             'roof': roof,
             'surface': surface,
@@ -325,7 +326,7 @@ class GamePageScraper(SeleniumScraper):
 
             teams.append(scrape_team())
 
-        self.data.replace({'team_games': teams})
+        self.data.update({'team_games': teams})
 
 
 class StadiumPageScraper(RequestsScraper):
@@ -448,7 +449,7 @@ class PlayerPageScraper(RequestsScraper):
 
         first, last = get_name()
 
-        self.data.replace({
+        self.data.update({
             'first': first,
             'last': last,
             'team': get_team(),
@@ -544,6 +545,12 @@ def scrape_game(link):
     game.scrape_basic_info()
     game.scrape_team_info()
     return game.data
+
+
+def scrape_stadium(link):
+    stadium = StadiumPageScraper(link)
+    stadium.scrape_basic_info()
+    return stadium.data
 
 
 # Utilities

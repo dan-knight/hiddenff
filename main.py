@@ -115,10 +115,22 @@ def scrape_games_and_export():
 
 
 def scrape_game(pfr_link):
-    pfr_data = pfr.scrape_game(pfr_link)
-    pfr_data['errors'] = list(pfr_data['errors'])
+    pfr_game = pfr.scrape_game(pfr_link)
+    pfr_game['errors'] = list(pfr_game['errors'])
 
-    return pfr_data
+    return pfr_game
+
+
+def scrape_stadiums_and_export(pfr_links):
+    data = {'stadiums': [scrape_stadium(link) for link in pfr_links]}
+
+    export_scrape('stadium-scrape', data)
+
+
+def scrape_stadium(pfr_link):
+    pfr_stadium = pfr.scrape_stadium(pfr_link)
+    pfr_stadium['errors'] = list(pfr_stadium['errors'])
+    return pfr_stadium
 
 
 def get_scraped_errors(filename):
@@ -174,6 +186,16 @@ def import_scrape(filename):
         return json.load(file)
 
 
+def get_scraped_stadium_links_from_games(filename):
+    games = import_scrape(filename)['games']
+    links = set()
+
+    for game in games:
+        links.add(game['stadium_link'])
+
+    return links
+
+
 if __name__ == '__main__':
     #guru_list_url = 'http://rotoguru1.com/cgi-bin/fstats.cgi?pos=0&sort=1&game=p&colA=0&daypt=0&xavg=0&inact=0&maxprc=99999&outcsv=0'
 
@@ -191,7 +213,28 @@ if __name__ == '__main__':
     #
     # db.session.commit()
 
-    print(wiki.get_stadium_link('Harvard Stadium'))
+    # stadium_links = get_scraped_stadium_links_from_games('game-scrape_2020-05-10_20-00-37.json')
+    # scrape_stadiums_and_export(stadium_links)
+    stadiums = import_scrape('stadium-scrape_2020-05-10_21-09-35.json')['stadiums']
+
+    # def get_value(data, stat_name):
+    #     value = ''
+    #
+    #     for data in reversed(data[stat_name]):
+    #         def get_years():
+    #             years = [int(year) for year in data['seasons']]
+    #             years[-1] += 1
+    #             return years
+    #
+    #         if current_year in range(*get_years()):
+    #             value = data[stat_name[stat_name[:-1]]]
+    #
+    #     return value
+    #
+    # for stadium in stadiums:
+    #     get_value(stadium, 'names')
+
+
 
 
 
