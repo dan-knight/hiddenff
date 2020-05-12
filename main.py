@@ -228,8 +228,17 @@ if __name__ == '__main__':
     #guru_list_url = 'http://rotoguru1.com/cgi-bin/fstats.cgi?pos=0&sort=1&game=p&colA=0&daypt=0&xavg=0&inact=0&maxprc=99999&outcsv=0'
 
     # players = import_scrape('player-scrape_2020-05-01_18-03-11.json')['players']
-    # games = import_scrape('game-scrape_2020-05-03_19-18-17.json')['games']
+    # games = import_scrape('game-scrape_2020-05-10_20-00-37.json')['games']
     # teams = import_scrape('teams')
+    # scrape_stadiums_and_export(get_scraped_stadium_links_from_games('game-scrape_2020-05-10_20-00-37.json'))
+    stadiums = import_scrape('stadium-scrape_2020-05-12_10-15-21.json')['stadiums']
+
+    for stadium in stadiums:
+        data = db.Stadium.sanitize_data(stadium)
+        print(data)
+
+    # db.Base.metadata.create_all(db.engine)
+    # db.session.commit()
     #
     # db.reset_tables()
     #
@@ -241,10 +250,8 @@ if __name__ == '__main__':
     #
     # db.session.commit()
 
-    stadium_links = get_scraped_stadium_links_from_games('stadium-scrape_2020-05-11_15-14-23.json')
+    # stadium_links = get_scraped_stadium_links_from_games('game-scrape_2020-05-10_20-00-37.json')
 
-    scrape_stadiums_and_export(stadium_links)
-    # stadiums = import_scrape('stadium-scrape_2020-05-10_21-09-35.json')['stadiums']
 
     # def get_value(data, stat_name):
     #     value = ''

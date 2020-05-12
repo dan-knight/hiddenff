@@ -139,7 +139,8 @@ class StadiumPageScraper(RequestsScraper):
                         def get_year_pairs():
                             def format_text():
                                 text = years_text.split(') ', 1)[1].strip()
-                                return text.strip('(').strip(')')
+                                no_citation_brackets = text.split('[', 1)[0]
+                                return no_citation_brackets.strip('(').strip(')')
 
                             return format_text().split(', ')
 
@@ -148,20 +149,23 @@ class StadiumPageScraper(RequestsScraper):
                     try:
                         years = parse_text(get_text())
                     except IndexError:
-                        self.add_error('years')
+                        self.add_error('seasons')
 
                     return years
 
-                return {'team': get_team_name(),
-                        'years': get_years()}
+                year_pairs = get_years()
+                team = get_team_name()
+
+                return [{'team': team,
+                        'seasons': years} for years in year_pairs]
 
             team_data = []
 
             try:
-                team_data = [get_team(link) for link in get_team_rows()]
+                for link in get_team_rows():
+                    team_data +=get_team(link)
             except AttributeError:
                 self.add_error('teams')
-
             return team_data
 
         self.data.update({'teams': get_teams()})
