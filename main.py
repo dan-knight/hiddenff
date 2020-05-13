@@ -227,28 +227,29 @@ def get_scraped_stadium_links_from_games(filename):
 if __name__ == '__main__':
     #guru_list_url = 'http://rotoguru1.com/cgi-bin/fstats.cgi?pos=0&sort=1&game=p&colA=0&daypt=0&xavg=0&inact=0&maxprc=99999&outcsv=0'
 
-    # players = import_scrape('player-scrape_2020-05-01_18-03-11.json')['players']
-    # games = import_scrape('game-scrape_2020-05-10_20-00-37.json')['games']
-    # teams = import_scrape('teams')
-    # scrape_stadiums_and_export(get_scraped_stadium_links_from_games('game-scrape_2020-05-10_20-00-37.json'))
+    players = import_scrape('player-scrape_2020-05-01_18-03-11.json')['players']
+    games = import_scrape('game-scrape_2020-05-10_20-00-37.json')['games']
+    teams = import_scrape('teams')
     stadiums = import_scrape('stadium-scrape_2020-05-12_10-15-21.json')['stadiums']
+
+    db.reset_tables()
+
+    db.update_from_scraped({'teams': teams,
+                            'games': games,
+                            'players': players,
+                            'stadiums': stadiums})
+
+    db.calculate_stats()
 
     for stadium in stadiums:
         data = db.Stadium.sanitize_data(stadium)
-        print(data)
+        db_stadium = db.Stadium.replace(data)
 
-    # db.Base.metadata.create_all(db.engine)
-    # db.session.commit()
-    #
-    # db.reset_tables()
-    #
-    # db.update_from_scraped({'teams': teams,
-    #                         'games': games,
-    #                         'players': players})
-    #
-    # db.calculate_stats()
-    #
-    # db.session.commit()
+        for team in data['teams']:
+            team = db.Team.get_from_cache(team)
+            db_stadium.teams.append(team)
+
+    db.session.commit()
 
     # stadium_links = get_scraped_stadium_links_from_games('game-scrape_2020-05-10_20-00-37.json')
 
