@@ -233,7 +233,7 @@ if __name__ == '__main__':
     stadiums = import_scrape('stadium-scrape_2020-05-12_10-15-21.json')['stadiums']
 
     # db.reset_tables()
-    #
+
     # db.update_from_scraped({'teams': teams,
     #                         'games': games,
     #                         'players': players,
@@ -260,24 +260,6 @@ if __name__ == '__main__':
     #                                         stadium=game['stadium_name']))
 
     # stadium_links = get_scraped_stadium_links_from_games('game-scrape_2020-05-10_20-00-37.json')
-
-    for team in teams:
-        data = db.Team.sanitize_data(team)
-        db.Team.replace(team)
-
-    for stadium in stadiums:
-        data = db.Stadium.sanitize_data(stadium)
-        db.Stadium.replace(data)
-
-    for game in games:
-        data = db.Game.sanitize_data(game)
-        db.Game.replace(data)
-
-    for player in players:
-        data = db.Player.sanitize_data(player)
-        db.Player.replace(data)
-
-    db.session.commit()
     # def get_value(data, stat_name):
     #     value = ''
     #
