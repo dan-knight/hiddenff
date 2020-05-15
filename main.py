@@ -234,57 +234,9 @@ if __name__ == '__main__':
 
     # db.reset_tables()
 
-    # db.update_from_scraped({'teams': teams,
-    #                         'games': games,
-    #                         'players': players,
-    #                         'stadiums': stadiums})
-    #
-    # db.calculate_stats()
-    #
-    # for stadium in stadiums:
-    #     data = db.Stadium.sanitize_data(stadium)
-    #     db_stadium = db.Stadium.replace(data)
-    #
-    #     for team in data['teams']:
-    #         team = db.Team.get_from_cache(team)
-    #         db_stadium.teams.append(team)
-    #
-    # db.session.commit()
+    db.update_from_scraped({'teams': teams,
+                            'games': games,
+                            'players': players,
+                            'stadiums': stadiums})
 
-    # for game in games:
-    #     for team_game in game['team_games']:
-    #         print(db.TeamGame.sanitize_data(team_game,
-    #                                         spread_text=game['spread'],
-    #                                         over_under=game['over_under'],
-    #                                         start=game['start'],
-    #                                         stadium=game['stadium_name']))
-
-    # stadium_links = get_scraped_stadium_links_from_games('game-scrape_2020-05-10_20-00-37.json')
-    # def get_value(data, stat_name):
-    #     value = ''
-    #
-    #     for data in reversed(data[stat_name]):
-    #         def get_years():
-    #             years = [int(year) for year in data['seasons']]
-    #             years[-1] += 1
-    #             return years
-    #
-    #         if current_year in range(*get_years()):
-    #             value = data[stat_name[stat_name[:-1]]]
-    #
-    #     return value
-    #
-    # for stadium in stadiums:
-    #     get_value(stadium, 'names')
-
-
-
-
-
-
-
-
-
-
-
-
+    db.calculate_stats()
