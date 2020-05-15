@@ -26,6 +26,15 @@ def create_time(iso_time):
                    int(split_text[2]))
 
 
+def try_data_then_kwargs(stat_name, data, **kwargs):
+    try:
+        value = data[stat_name]
+    except KeyError:
+        value = kwargs[stat_name]
+
+    return value
+
+
 # Keys
 def get_team_keys():
     teams = {}
