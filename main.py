@@ -273,6 +273,9 @@ if __name__ == '__main__':
         data = db.Game.sanitize_data(game)
         db.Game.replace(data)
 
+    for player in players:
+        data = db.Player.sanitize_data(player)
+        db.Player.replace(data)
 
     db.session.commit()
     # def get_value(data, stat_name):
