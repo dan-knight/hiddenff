@@ -267,10 +267,7 @@ if __name__ == '__main__':
 
     for stadium in stadiums:
         data = db.Stadium.sanitize_data(stadium)
-        # print(data)
-        db_stadium = db.Stadium.new(data)
-        print(db_stadium)
-        # db.session.add(db_stadium)
+        db.Stadium.replace(data)
 
 
     db.session.commit()
