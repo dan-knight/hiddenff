@@ -232,7 +232,7 @@ if __name__ == '__main__':
     teams = import_scrape('teams')
     stadiums = import_scrape('stadium-scrape_2020-05-12_10-15-21.json')['stadiums']
 
-    db.reset_tables()
+    # db.reset_tables()
     #
     # db.update_from_scraped({'teams': teams,
     #                         'games': games,
@@ -268,6 +268,10 @@ if __name__ == '__main__':
     for stadium in stadiums:
         data = db.Stadium.sanitize_data(stadium)
         db.Stadium.replace(data)
+
+    for game in games:
+        data = db.Game.sanitize_data(game)
+        db.Game.replace(data)
 
 
     db.session.commit()
