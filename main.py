@@ -230,21 +230,18 @@ if __name__ == '__main__':
     #guru_list_url = 'http://rotoguru1.com/cgi-bin/fstats.cgi?pos=0&sort=1&game=p&colA=0&daypt=0&xavg=0&inact=0&maxprc=99999&outcsv=0'
 
     players = import_scrape('player-scrape_2020-05-01_18-03-11.json')['players']
-    games = import_scrape('game-scrape_2020-05-10_20-00-37.json')['games']
+    games = import_scrape('game-scrape_2020-05-15_19-41-29.json')['games']
     teams = import_scrape('teams')
     stadiums = import_scrape('stadium-scrape_2020-05-12_10-15-21.json')['stadiums']
 
     # db.reset_tables()
-    #
-    # db.update_from_scraped({'teams': teams,
-    #                         'games': games,
-    #                         'players': players,
-    #                         'stadiums': stadiums})
-    #
-    # db.calculate_stats()
 
-    print_scraped_errors('game-scrape_2020-05-15_19-41-29.json')
+    db.update_from_scraped({'teams': teams,
+                            'games': games,
+                            'players': players,
+                            'stadiums': stadiums})
 
-    close_driver()
+    db.calculate_stats()
 
-    # db.session.commit()
+    # close_driver()
+    db.session.commit()
