@@ -6,7 +6,7 @@ from scrape.base import close_driver
 from db import db
 
 import learn
-from config import current_year, current_week
+from config import current_season, current_week
 
 import json
 import re
@@ -96,16 +96,18 @@ def scrape_player(guru_link):
     return combine_scraped_data()
 
 
-def scrape_games_and_export():
-    def get_pfr_links():
+def scrape_games_and_export(weeks=current_week, season=current_season):
+    def get_pfr_links(weeks_to_scrape):
         links = []
-
-        for week in range(1, current_week + 1):
-            links += pfr.get_game_links(week)
+        try:
+            for week in weeks_to_scrape:
+                links += pfr.get_game_links(week, season)
+        except TypeError:
+            links = get_pfr_links([weeks_to_scrape])
 
         return links
 
-    pfr_links = get_pfr_links()
+    pfr_links = get_pfr_links(weeks)
 
     data = {
         'games': [scrape_game(link) for link in pfr_links]
@@ -233,10 +235,14 @@ if __name__ == '__main__':
     stadiums = import_scrape('stadium-scrape_2020-05-12_10-15-21.json')['stadiums']
 
     # db.reset_tables()
+    #
+    # db.update_from_scraped({'teams': teams,
+    #                         'games': games,
+    #                         'players': players,
+    #                         'stadiums': stadiums})
+    #
+    # db.calculate_stats()
 
-    db.update_from_scraped({'teams': teams,
-                            'games': games,
-                            'players': players,
-                            'stadiums': stadiums})
+    scrape_games_and_export(range(1, current_week + 1), 2011)
 
-    db.calculate_stats()
+    # db.session.commit()

@@ -1,5 +1,5 @@
 from scrape.base import RequestsScraper, SeleniumScraper
-from config import current_year, current_week
+from config import current_season, current_week
 from utility import month_keys
 
 from selenium.webdriver.support import expected_conditions as cond
@@ -10,8 +10,8 @@ import json
 
 
 class GameListScraper(RequestsScraper):
-    def __init__(self, year=current_year):
-        url = 'https://www.pro-football-reference.com/years/%s/games.htm' % year
+    def __init__(self, season):
+        url = 'https://www.pro-football-reference.com/years/%s/games.htm' % season
         super().__init__(url)
 
         def get_container():
@@ -38,7 +38,7 @@ class GameListScraper(RequestsScraper):
 
 
 class PlayerListScraper(RequestsScraper):
-    def __init__(self, year=current_year):
+    def __init__(self, year=current_season):
         url = 'https://www.pro-football-reference.com/years/%s/fantasy.htm' % year
         super().__init__(url)
 
@@ -397,7 +397,7 @@ class StadiumPageScraper(RequestsScraper):
 
 
 class PlayerPageScraper(RequestsScraper):
-    def __init__(self, url, year=current_year):
+    def __init__(self, url, year=current_season):
         self.year = year
 
         def format_gamelog_url():
@@ -512,19 +512,19 @@ def get_player_link(first, last):
     return link
 
 
-def get_game_links(week):
-    global game_list_scraper
+def get_game_links(week, season):
+    global game_list_cache
 
     try:
-        links = game_list_scraper.get_week_links(week)
-    except AttributeError:
-        game_list_scraper = GameListScraper()
-        links = get_game_links(week)
+        links = game_list_cache[season].get_week_links(week)
+    except KeyError:
+        game_list_cache[season] = GameListScraper(season)
+        links = get_game_links(week, season)
 
     return links
 
 
-def scrape_player(link, year=current_year, weeks=current_week):
+def scrape_player(link, year=current_season, weeks=current_week):
     player = PlayerPageScraper(link, year)
     player.scrape_basic_info()
 
@@ -556,7 +556,7 @@ def scrape_stadium(link):
 
 # Utilities
 player_list_scraper = None
-game_list_scraper = None
+game_list_cache = {}
 
 with open('./scrape/error/pfr.json') as file:
     errors = json.load(file)
