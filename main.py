@@ -243,6 +243,8 @@ if __name__ == '__main__':
     #
     # db.calculate_stats()
 
-    scrape_games_and_export(range(1, current_week + 1), 2011)
+    print_scraped_errors('game-scrape_2020-05-15_19-41-29.json')
+
+    close_driver()
 
     # db.session.commit()

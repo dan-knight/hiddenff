@@ -92,6 +92,23 @@ class GamePageScraper(SeleniumScraper):
         ))
 
     def scrape_basic_info(self):
+        def get_season():
+            season = ''
+
+            def get_li():
+                container = self.soup.find('div', id='inner_nav')
+                ul = container.find('ul', attrs={'class': 'hoversmooth'})
+                return ul.find('li', text=re.compile('NFL Scores'))
+
+            try:
+                text = get_li().text
+                split_text = text.split(' ', 1)
+                season = split_text[0]
+            except AttributeError:
+                self.add_error('season')
+
+            return season
+
         def get_week():
             text = ''
 
@@ -235,6 +252,7 @@ class GamePageScraper(SeleniumScraper):
         roof, surface, spread, over_under = scrape_game_info()
 
         self.data.update({
+            'season': get_season(),
             'week': get_week(),
             'start': start,
             'stadium_name': stadium_name,
