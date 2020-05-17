@@ -1,19 +1,40 @@
-from scrape.base import RequestsScraper
+from scrape.base import RequestsScraper, SeleniumScraper
+
+from selenium.webdriver.support import expected_conditions as cond
+from selenium.webdriver.common.by import By
 
 import re
 
 
-class PlayerListScraper(RequestsScraper):
-    pass
+class PlayerListScraper(SeleniumScraper):
+    def __init__(self, season, week):
+        url = 'http://rotoguru1.com/cgi-bin/fyday.pl?week=%s&year=%s&game=dk' % (week, season)
+        super().__init__(url)
+        self.data.update({'season': season})
+
+    def interact_with_page(self):
+        SeleniumScraper.wait_for_condition(cond.presence_of_element_located((By.XPATH, '//table//p/table')))
 
     def get_player_links(self):
-        container = self.soup.find('pre')
-        link_tags = container.find_all('a', href=lambda href: href.startswith('playrf'))
+        def get_table():
+            p = self.soup.find(text=re.compile('DFS salaries')).parent
+            return p.find('table').find('table')
 
-        def is_defense(a):
-            return a.previous_sibling.strip().endswith('D')
+        def get_rows():
+            return get_table().find_all('tr')
 
-        return [prepend_link(tag['href']) for tag in link_tags if not is_defense(tag)]
+        links = []
+
+        for row in get_rows():
+            a = row.find('a', {'target': '_blank'})
+
+            try:
+                if 'Defense' not in a.text:
+                    links.append(a['href'])
+            except AttributeError:
+                continue
+
+        self.data.update({'links': links})
 
 
 class PlayerPageScraper(RequestsScraper):

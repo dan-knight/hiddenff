@@ -4,6 +4,7 @@ from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as cond
 from selenium.common.exceptions import TimeoutException, StaleElementReferenceException, ElementNotInteractableException
+from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 
 from bs4 import BeautifulSoup
 
@@ -50,11 +51,10 @@ class SeleniumScraper(Scraper):
             self.setup_page()
             html = driver.page_source
         except AttributeError:
-            driver = webdriver.Firefox()
+            launch_driver()
             html = self.get_html()
 
         return html
-
 
     def setup_page(self):
         try:
@@ -96,11 +96,19 @@ class SeleniumScraper(Scraper):
 
 driver = None
 
+caps = DesiredCapabilities().FIREFOX
+caps['pageLoadStrategy'] = 'eager'
+
+
+def launch_driver():
+    global driver
+    driver = webdriver.Firefox(desired_capabilities=caps)
+
 
 def restart_driver():
     global driver
     driver.close()
-    driver = webdriver.Firefox()
+    launch_driver()
 
 
 def close_driver():

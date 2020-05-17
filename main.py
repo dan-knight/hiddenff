@@ -229,19 +229,28 @@ def get_scraped_stadium_links_from_games(filename):
 if __name__ == '__main__':
     #guru_list_url = 'http://rotoguru1.com/cgi-bin/fstats.cgi?pos=0&sort=1&game=p&colA=0&daypt=0&xavg=0&inact=0&maxprc=99999&outcsv=0'
 
-    players = import_scrape('player-scrape_2020-05-01_18-03-11.json')['players']
-    games = import_scrape('game-scrape_2020-05-15_19-41-29.json')['games']
-    teams = import_scrape('teams')
-    stadiums = import_scrape('stadium-scrape_2020-05-12_10-15-21.json')['stadiums']
-
-    # db.reset_tables()
-
-    db.update_from_scraped({'teams': teams,
-                            'games': games,
-                            'players': players,
-                            'stadiums': stadiums})
-
-    db.calculate_stats()
+    # players = import_scrape('player-scrape_2020-05-01_18-03-11.json')['players']
+    # games = import_scrape('game-scrape_2020-05-15_19-41-29.json')['games']
+    # teams = import_scrape('teams')
+    # stadiums = import_scrape('stadium-scrape_2020-05-12_10-15-21.json')['stadiums']
+    #
+    # # db.reset_tables()
+    #
+    # db.update_from_scraped({'teams': teams,
+    #                         'games': games,
+    #                         'players': players,
+    #                         'stadiums': stadiums})
+    #
+    # db.calculate_stats()
 
     # close_driver()
-    db.session.commit()
+    # db.session.commit()
+
+    for season in range(2014, current_season + 1):
+        for week in range(1, 17 + 1):
+            scraper = guru.PlayerListScraper(season, week)
+            scraper.get_player_links()
+            print(scraper.data)
+
+    close_driver()
+
