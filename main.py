@@ -17,9 +17,15 @@ import datetime as dt
 
 
 # Scraping
-def scrape_players_and_export(guru_list_link):
+def scrape_players_and_export(season_week_pairs=None):
+    if season_week_pairs is None:
+        season_week_pairs = {current_season: [current_week]}
+
+    guru_links = guru.get_player_links(season_week_pairs)
+    print(guru_links)
+
     data = {
-        'players': [scrape_player(link) for link in guru.PlayerListScraper(guru_list_link).get_player_links()]
+        'players': [scrape_player(link) for link in guru_links]
     }
 
     export_scrape('player-scrape', data)
@@ -246,11 +252,7 @@ if __name__ == '__main__':
     # close_driver()
     # db.session.commit()
 
-    for season in range(2014, current_season + 1):
-        for week in range(1, 17 + 1):
-            scraper = guru.PlayerListScraper(season, week)
-            scraper.get_player_links()
-            print(scraper.data)
+    scrape_players_and_export({'2019': 1})
 
     close_driver()
 

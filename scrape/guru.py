@@ -1,3 +1,5 @@
+from config import current_season, current_week
+
 from scrape.base import RequestsScraper, SeleniumScraper
 
 from selenium.webdriver.support import expected_conditions as cond
@@ -23,18 +25,18 @@ class PlayerListScraper(SeleniumScraper):
         def get_rows():
             return get_table().find_all('tr')
 
-        links = []
+        links = set()
 
         for row in get_rows():
             a = row.find('a', {'target': '_blank'})
 
             try:
                 if 'Defense' not in a.text:
-                    links.append(a['href'])
+                    links.add(a['href'])
             except AttributeError:
                 continue
 
-        self.data.update({'links': links})
+        return links
 
 
 class PlayerPageScraper(RequestsScraper):
@@ -88,19 +90,28 @@ class PlayerPageScraper(RequestsScraper):
 
         first, last = get_name()
 
-        self.data.replace({
+        self.data.update({
             'first': first,
             'last': last,
             'position': get_position()
         })
 
 
-def scrape_week():
-    player_list_url = 'http://rotoguru1.com/cgi-bin/fstats.cgi?pos=0&sort=1&game=p&colA=0&daypt=0&xavg=0&inact=0&maxprc=99999&outcsv=0'
+def get_player_links(season_weeks_pairs):
+    links = set()
 
-    player_links = PlayerListScraper(player_list_url).get_player_links()
+    for season, weeks in season_weeks_pairs.items():
+        def scrape_season(week_list):
+            try:
+                for week in week_list:
+                    links.update(PlayerListScraper(season, week).get_player_links())
+            except TypeError:
+                scrape_season([week_list])
 
-    return [scrape_player(link) for link in player_links]
+        if int(season) >= 2014:
+            scrape_season(weeks)
+
+    return links
 
 
 def scrape_player(link):
