@@ -273,8 +273,15 @@ def get_player_links(first, last, position):
 
                 return links
 
-            guru_position = positions.pop(position)
-            player_links = scrape_position(guru_position)
+            def get_guru_position():
+                try:
+                    guru_position = positions.pop(position)
+                except KeyError:
+                    guru_position = positions.pop('RB')
+
+                return guru_position
+
+            player_links = scrape_position(get_guru_position())
 
             if not player_links:
                 def scrape_other_positions():

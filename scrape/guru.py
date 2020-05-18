@@ -23,17 +23,22 @@ class PlayerListScraper(SeleniumScraper):
             return p.find('table').find('table')
 
         def get_rows():
-            return get_table().find_all('tr')
+            rows = []
+
+            defense_title = get_table().find('b', text=re.compile('Defenses')).find_parent('tr')
+
+            for sibling_row in defense_title.previous_siblings:
+                rows.append(sibling_row)
+
+            return rows
 
         links = set()
 
         for row in get_rows():
-            a = row.find('a', {'target': '_blank'})
-
             try:
-                if 'Defense' not in a.text:
-                    links.add(a['href'])
-            except AttributeError:
+                a = row.find('a', {'target': '_blank'})
+                links.add(a['href'])
+            except TypeError:
                 continue
 
         return links

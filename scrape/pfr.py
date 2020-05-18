@@ -415,23 +415,21 @@ class StadiumPageScraper(RequestsScraper):
 
 
 class PlayerPageScraper(RequestsScraper):
-    def __init__(self, url, year=current_season):
-        self.year = year
-
+    def __init__(self, url, season):
         def format_gamelog_url():
-            append = '/gamelog/%s/' % self.year
+            append = '/gamelog/%s/' % season
             return re.sub('.htm$', append, url)
 
         super().__init__(format_gamelog_url())
-        self.data['games'] = []
+
+        self.meta_div = self.soup.find('div', id='meta')
+        self.data['games'] = {}
 
     def scrape_basic_info(self):
-        container = self.soup.find('div', id='meta')
-
         def get_name():
             first_text = ''
             last_text = ''
-            h1 = container.find('h1', {'itemprop': 'name'})
+            h1 = self.meta_div.find('h1', {'itemprop': 'name'})
 
             try:
                 full_name = h1.text
@@ -445,7 +443,7 @@ class PlayerPageScraper(RequestsScraper):
 
         def get_team():
             text = ''
-            span = container.find('span', {'itemprop': 'affiliation'})
+            span = self.meta_div.find('span', {'itemprop': 'affiliation'})
 
             try:
                 text = span.text
@@ -457,7 +455,7 @@ class PlayerPageScraper(RequestsScraper):
         def get_birthday():
             text = ''
 
-            span = container.find('span', id='necro-birth')
+            span = self.meta_div.find('span', id='necro-birth')
 
             try:
                 text = span['data-birth']
@@ -475,47 +473,61 @@ class PlayerPageScraper(RequestsScraper):
             'birthday': get_birthday()
         })
 
-    def scrape_game_stats(self, week=current_week):
-        def get_row():
-            td = self.soup.find('td', {'data-stat': 'week_num'}, text=week)
-            return td.parent
+    def scrape_position(self):
+        pass
 
-        try:
-            row = get_row()
+    def scrape_game_stats(self, weeks):
+        def get_game_rows(game_weeks):
+            rows = []
 
-            def get_datastat_text(label):
-                text = '0'
-                td = row.find('td', {'data-stat': label})
+            try:
+                for week in game_weeks:
+                    td = self.soup.find('td', {'data-stat': 'week_num'}, text=week)
+                    if td:
+                        rows.append(td.parent)
+            except TypeError:
+                rows = get_game_rows([game_weeks])
+            return rows
 
-                try:
-                    text = td.text
-                except AttributeError:
-                    pass
+        for row in get_game_rows(weeks):
+            def scrape_game_row():
+                def get_datastat_text(label):
+                    text = '0'
+                    td = row.find('td', {'data-stat': label})
 
-                return text
+                    try:
+                        text = td.text
+                    except AttributeError:
+                        pass
 
-            self.data['games'].append({
-                'year': self.year,
-                'week': week,
-                'team': get_datastat_text('team'),
-                'rush_att': get_datastat_text('rush_att'),
-                'rush_yd': get_datastat_text('rush_yds'),
-                'rush_td': get_datastat_text('rush_td'),
-                'fum': get_datastat_text('fumbles'),
-                'tgt': get_datastat_text('targets'),
-                'rec': get_datastat_text('rec'),
-                'rec_yd': get_datastat_text('rec_yds'),
-                'rec_td': get_datastat_text('rec_td'),
-                'pass_att': get_datastat_text('pass_att'),
-                'pass_cmp': get_datastat_text('pass_cmp'),
-                'pass_yd': get_datastat_text('pass_yds'),
-                'pass_td': get_datastat_text('pass_td'),
-                'int': get_datastat_text('pass_int'),
-                'sacked': get_datastat_text('pass_sacked'),
-                'snaps': get_datastat_text('offense')
-            })
-        except AttributeError:
-            pass
+                    return text
+
+                week = get_datastat_text('week_num')
+
+                data = {week: {'team': get_datastat_text('team'),
+                               'rush_att': get_datastat_text('rush_att'),
+                               'rush_yd': get_datastat_text('rush_yds'),
+                               'rush_td': get_datastat_text('rush_td'),
+                               'fum': get_datastat_text('fumbles'),
+                               'tgt': get_datastat_text('targets'),
+                               'rec': get_datastat_text('rec'),
+                               'rec_yd': get_datastat_text('rec_yds'),
+                               'rec_td': get_datastat_text('rec_td'),
+                               'pass_att': get_datastat_text('pass_att'),
+                               'pass_cmp': get_datastat_text('pass_cmp'),
+                               'pass_yd': get_datastat_text('pass_yds'),
+                               'pass_td': get_datastat_text('pass_td'),
+                               'int': get_datastat_text('pass_int'),
+                               'sacked': get_datastat_text('pass_sacked'),
+                               'snaps': get_datastat_text('offense')
+                               }}
+
+                return data
+
+            try:
+                self.data['games'].update(scrape_game_row())
+            except AttributeError:
+                pass
 
 
 def get_player_link(first, last):
@@ -542,21 +554,32 @@ def get_game_links(week, season):
     return links
 
 
-def scrape_player(link, year=current_season, weeks=current_week):
-    player = PlayerPageScraper(link, year)
-    player.scrape_basic_info()
+def scrape_player(link, season_week_pairs):
+    player = {'games': {}}
+    seasons = list(season_week_pairs)
 
-    def scrape_games():
-        for week in weeks:
-            player.scrape_game_stats(week)
+    def scrape_first_season():
+        season_ = seasons.pop()
+        player_scraper = PlayerPageScraper(link, season_)
 
-    try:
-        scrape_games()
-    except TypeError:
-        weeks = [weeks]
-        scrape_games()
+        player_scraper.scrape_basic_info()
+        player.update(player_scraper.data)
 
-    return player.data
+        scrape_season(player_scraper, season_)
+
+    def scrape_season(scraper, season_):
+        scraper.scrape_game_stats(season_week_pairs[season_])
+        games = scraper.data['games']
+
+        if games:
+            player['games'].update({season_: games})
+
+    scrape_first_season()
+    for season in seasons:
+        game_scraper = PlayerPageScraper(link, season)
+        scrape_season(game_scraper, season)
+
+    return player
 
 
 def scrape_game(link):
@@ -581,4 +604,9 @@ with open('./scrape/error/pfr.json') as file:
 
 
 def prepend_link(link):
-    return 'https://www.pro-football-reference.com' + link
+    try:
+        text = 'https://www.pro-football-reference.com' + link
+    except TypeError:
+        text = ''
+
+    return

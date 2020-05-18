@@ -22,16 +22,15 @@ def scrape_players_and_export(season_week_pairs=None):
         season_week_pairs = {current_season: [current_week]}
 
     guru_links = guru.get_player_links(season_week_pairs)
-    print(guru_links)
 
     data = {
-        'players': [scrape_player(link) for link in guru_links]
+        'players': [scrape_player(link, season_week_pairs) for link in guru_links]
     }
 
     export_scrape('player-scrape', data)
 
 
-def scrape_player(guru_link):
+def scrape_player(guru_link, season_week_pairs):
     guru_data = guru.scrape_player(guru_link)
 
     def get_pfr_link():
@@ -45,20 +44,20 @@ def scrape_player(guru_link):
     pfr_link = get_pfr_link()
 
     def get_pfr_data():
-        return pfr.scrape_player(pfr_link, weeks=range(1, 18)) if pfr_link else {'url': pfr_link,
-                                                                                 'errors': {'pfr_link'}}
+        return pfr.scrape_player(pfr_link, season_week_pairs) if pfr_link else {'url': pfr_link,
+                                                                                'errors': {'pfr_link'}}
 
     pfr_data = get_pfr_data()
 
     def combine_scraped_data():
         scraped_data = {
-            'links': [guru_data['url'], pfr_data['url']],
+            'links': [guru_data['url'], pfr_link],
             'first': guru_data['first'],
             'last': guru_data['last'],
             'position': guru_data['position'],
-            'team': pfr_data['team'],
-            'birthday': pfr_data['birthday'],
-            'games': pfr_data['games'],
+            'team': pfr_data.get('team'),
+            'birthday': pfr_data.get('birthday'),
+            'games': pfr_data.get('games'),
         }
 
         def check_data_errors():
@@ -74,7 +73,7 @@ def scrape_player(guru_link):
         def check_errors():
             def combine_errors():
                 all_errors = guru_data['errors']
-                all_errors.replace(pfr_data['errors'])
+                all_errors.update(pfr_data['errors'])
                 return all_errors
 
             errors = combine_errors()
@@ -87,7 +86,7 @@ def scrape_player(guru_link):
                     if wiki_data['birthday'] == scraped_data['birthday']:
                         def update_scraped_data():
                             for error in errors.copy():
-                                if wiki_data[error]:
+                                if wiki_data.get(error):
                                     scraped_data.update({error: wiki_data[error]})
                                     errors.remove(error)
 
@@ -252,7 +251,7 @@ if __name__ == '__main__':
     # close_driver()
     # db.session.commit()
 
-    scrape_players_and_export({'2019': 1})
+    scrape_players_and_export({2019: range(1, 17 + 1)})
 
     close_driver()
 
