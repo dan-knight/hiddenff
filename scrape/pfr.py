@@ -38,8 +38,8 @@ class GameListScraper(RequestsScraper):
 
 
 class PlayerListScraper(RequestsScraper):
-    def __init__(self, year=current_season):
-        url = 'https://www.pro-football-reference.com/years/%s/fantasy.htm' % year
+    def __init__(self, season):
+        url = 'https://www.pro-football-reference.com/years/%s/fantasy.htm' % season
         super().__init__(url)
 
         def get_container():
@@ -422,8 +422,9 @@ class PlayerPageScraper(RequestsScraper):
 
         super().__init__(format_gamelog_url())
 
+        self.season = season
         self.meta_div = self.soup.find('div', id='meta')
-        self.data['games'] = {}
+        self.data['games'] = {season: {}}
 
     def scrape_basic_info(self):
         def get_name():
@@ -525,19 +526,26 @@ class PlayerPageScraper(RequestsScraper):
                 return data
 
             try:
-                self.data['games'].update(scrape_game_row())
+                self.data['games'][self.season].update(scrape_game_row())
             except AttributeError:
                 pass
 
 
-def get_player_link(first, last):
-    global player_list_scraper
+def get_player_link(first, last, seasons=current_season):
+    global player_list_cache
 
-    try:
-        link = player_list_scraper.get_link(first, last)
-    except AttributeError:
-        player_list_scraper = PlayerListScraper()
-        link = get_player_link(first, last)
+    link = ''
+
+    for season in seasons:
+        try:
+            player_list = player_list_cache[season]
+        except KeyError:
+            player_list = PlayerListScraper(season)
+
+        link = player_list.get_link(first, last)
+
+        if link:
+            break
 
     return link
 
@@ -557,27 +565,28 @@ def get_game_links(week, season):
 def scrape_player(link, season_week_pairs):
     player = {'games': {}}
     seasons = list(season_week_pairs)
+    first_season = seasons.pop()
 
-    def scrape_first_season():
-        season_ = seasons.pop()
-        player_scraper = PlayerPageScraper(link, season_)
+    def add_basic_info():
+        player_scraper = PlayerPageScraper(link, first_season)
 
         player_scraper.scrape_basic_info()
         player.update(player_scraper.data)
 
-        scrape_season(player_scraper, season_)
+        return player_scraper
 
-    def scrape_season(scraper, season_):
+    def add_season(scraper, season_):
         scraper.scrape_game_stats(season_week_pairs[season_])
-        games = scraper.data['games']
 
-        if games:
-            player['games'].update({season_: games})
+        if scraper.data['games'][scraper.season]:
+            player['games'].update(scraper.data['games'])
 
-    scrape_first_season()
+    first_scraper = add_basic_info()
+    add_season(first_scraper, first_season)
+
     for season in seasons:
         game_scraper = PlayerPageScraper(link, season)
-        scrape_season(game_scraper, season)
+        add_season(game_scraper, season)
 
     return player
 
@@ -596,7 +605,7 @@ def scrape_stadium(link):
 
 
 # Utilities
-player_list_scraper = None
+player_list_cache = {}
 game_list_cache = {}
 
 with open('./scrape/error/pfr.json') as file:
@@ -609,4 +618,4 @@ def prepend_link(link):
     except TypeError:
         text = ''
 
-    return
+    return text

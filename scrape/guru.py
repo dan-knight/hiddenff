@@ -32,12 +32,12 @@ class PlayerListScraper(SeleniumScraper):
 
             return rows
 
-        links = set()
+        links = {}
 
         for row in get_rows():
             try:
                 a = row.find('a', {'target': '_blank'})
-                links.add(a['href'])
+                links.update({a['href']: a.text})
             except TypeError:
                 continue
 
@@ -45,7 +45,9 @@ class PlayerListScraper(SeleniumScraper):
 
 
 class PlayerPageScraper(RequestsScraper):
-    pass
+    def __init__(self, url, list_name=None):
+        super().__init__(url)
+        self.list_name = list_name
 
     def scrape_basic_info(self):
         def get_name():
@@ -60,12 +62,12 @@ class PlayerPageScraper(RequestsScraper):
             try:
                 full_name = container.find('b').text
 
-                try:
-                    def get_player_name():
-                        split_text = full_name.split(', ')
-                        return split_text[1], split_text[0]
+                def get_player_name(name):
+                    split_text = name.split(', ')
+                    return split_text[1], split_text[0]
 
-                    first_text, last_text = get_player_name()
+                try:
+                    first_text, last_text = get_player_name(full_name)
                 except IndexError:
                     if 'Defense' in full_name:
                         def get_defense_name():
@@ -76,7 +78,7 @@ class PlayerPageScraper(RequestsScraper):
 
                         first_text, last_text = get_defense_name()
                     else:
-                        add_error()
+                        first_text, last_text = get_player_name(self.list_name)
             except AttributeError:
                 add_error()
 
@@ -102,8 +104,8 @@ class PlayerPageScraper(RequestsScraper):
         })
 
 
-def get_player_links(season_weeks_pairs):
-    links = set()
+def get_player_links_and_names(season_weeks_pairs):
+    links = {}
 
     for season, weeks in season_weeks_pairs.items():
         def scrape_season(week_list):
@@ -119,8 +121,8 @@ def get_player_links(season_weeks_pairs):
     return links
 
 
-def scrape_player(link):
-    player = PlayerPageScraper(link)
+def scrape_player(link, list_name=None):
+    player = PlayerPageScraper(link, list_name)
     player.scrape_basic_info()
     return player.data
 

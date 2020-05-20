@@ -21,20 +21,20 @@ def scrape_players_and_export(season_week_pairs=None):
     if season_week_pairs is None:
         season_week_pairs = {current_season: [current_week]}
 
-    guru_links = guru.get_player_links(season_week_pairs)
+    guru_links_and_names = guru.get_player_links_and_names(season_week_pairs)
 
     data = {
-        'players': [scrape_player(link, season_week_pairs) for link in guru_links]
+        'players': [scrape_player(link, season_week_pairs, name) for link, name in guru_links_and_names.items()]
     }
 
     export_scrape('player-scrape', data)
 
 
-def scrape_player(guru_link, season_week_pairs):
-    guru_data = guru.scrape_player(guru_link)
+def scrape_player(guru_link, season_week_pairs, name=None):
+    guru_data = guru.scrape_player(guru_link, name)
 
     def get_pfr_link():
-        link = pfr.get_player_link(guru_data['first'], guru_data['last'])
+        link = pfr.get_player_link(guru_data['first'], guru_data['last'], list(season_week_pairs))
 
         if not link:
             link = pfr.prepend_link(pfr.errors['player_links'].get(guru_link))
@@ -251,7 +251,11 @@ if __name__ == '__main__':
     # close_driver()
     # db.session.commit()
 
-    scrape_players_and_export({2019: range(1, 17 + 1)})
-
+    scrape_players_and_export(dict.fromkeys(range(2014, 2019 + 1), range(1, 17 + 1)))
     close_driver()
+
+    # for player in import_scrape('')['players']:
+    #     if player['errors']:
+    #         print(player)
+
 
