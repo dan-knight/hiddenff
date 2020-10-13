@@ -6,10 +6,22 @@ import TopNav from './components/TopNav';
 import './style/main.css';
 
 export default class App extends Component {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      showMenu: false
+    };
+  };
+
+  toggleMenu = () => {
+    this.setState(prevState => ({ showMenu: !prevState.showMenu }));
+  };
+
   render() {
     return (
       <React.Fragment>
-        <TopNav color='light' />
+        <TopNav color='light' onToggle={this.toggleMenu}/>
         <Container>
           <Row>
             <Col>
