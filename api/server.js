@@ -14,6 +14,7 @@ async function run() {
 
 
   const app = require('express')();
+  app.use(require('cors')());
 
   app.get('/players', async (req, res) => {
     const players = await db.getPlayers('last', req.query.start * 20);
