@@ -14,14 +14,27 @@ export default class App extends Component {
 
     this.state = {
       loading: true,
+      position: null,
+      orderBy: 'last',
       showMenu: false,
-      position: 'RB',
       data: []
     };
   };
 
-  async componentDidMount() {
-    const players = await getPlayers();
+  componentDidMount() {
+    if (this.state.loading) {
+      this.updateData();
+    };
+  };
+
+  componentDidUpdate() {
+    if (this.state.loading) {
+      this.updateData();
+    };
+  };
+
+  updateData = async () => {
+    const players = await this.getPlayerData();
     
     this.setState(() => ({ 
       loading: false,
@@ -29,12 +42,20 @@ export default class App extends Component {
     }));
   };
 
+  async getPlayerData() {
+    const response = await getPlayers(this.state.data.length, this.state.orderBy, this.state.position);
+    return response;
+  };
+
   toggleMenu = () => {
     this.setState(prevState => ({ showMenu: !prevState.showMenu }));
   };
 
   setPosition = value => {
-    this.setState(() => ({ position: value }));
+    this.setState(() => ({ 
+      loading: true,
+      position: value
+    }));
   };
 
   render() {
@@ -49,7 +70,7 @@ export default class App extends Component {
                 columns={[
                   { label: 'name', func: d => `${d.first} ${d.last}`},
                   { label: 'position', func: d => d.position },
-                  { label: 'team', func: d => d.team }
+                  { label: 'team', func: d => d.team || '-' }
                 ]}
                 data={this.state.data} />
             </Col>

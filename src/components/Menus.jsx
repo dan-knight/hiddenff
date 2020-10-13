@@ -6,7 +6,7 @@ export function PositionMenu(props) {
     <FilterMenu
       title='Position' 
       options={[
-        { value: '', label: 'All' },
+        { value: null, label: 'All' },
         { value: 'QB'},
         { value: 'RB'},
         { value: 'WR'},
