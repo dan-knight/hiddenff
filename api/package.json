@@ -12,7 +12,9 @@
   "dependencies": {
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
-    "knex": "^0.21.6"
+    "knex": "^0.21.6",
+    "knex-utils": "^4.1.7",
+    "mysql2": "^2.2.5"
   },
   "devDependencies": {
     "nodemon": "^2.0.4"
