@@ -1,4 +1,5 @@
-require('dotenv');
+const knexUtils = require('knex-utils');
+
 const heartbeatChecker = require('knex-utils').heartbeatChecker;
 
 class Database {
@@ -12,6 +13,12 @@ class Database {
   async isConnected() {
     const response = await heartbeatChecker.checkHeartbeat(this.dbInstance, heartbeatChecker.HEARTBEAT_QUERIES.MYSQL);
     return response['isOk'];
+  };
+
+  async getPlayers(orderBy, startNumber) {
+    const query = await this.dbInstance.select(['first', 'last', 'position', 'team_id'])
+      .from('players').orderBy(orderBy).limit(20).offset(startNumber);
+    return query;
   };
 };
 

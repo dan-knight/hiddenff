@@ -1,9 +1,5 @@
-const app = require('express')();
 require('dotenv').config({ path: '../.env' });
-
-app.get('/', (req, res) => {
-  res.status(200).send('Success');
-});
+const utility = require('./utility');
 
 async function run() {
   const dbConfig = {
@@ -15,6 +11,17 @@ async function run() {
   };
 
   const db = await new require('./db').newConnection(dbConfig);
+
+
+  const app = require('express')();
+
+  app.get('/players', async (req, res) => {
+    const players = await db.getPlayers('last', req.query.start * 20);
+    players.forEach(p => utility.renameKey(p, 'team_id', 'team'));
+
+    res.status(200).json(players);
+  });
+
 
   const apiPort = process.env.API_PORT;
   app.listen(apiPort, console.log(`Listening on port ${apiPort}`));
