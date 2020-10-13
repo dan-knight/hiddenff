@@ -4,6 +4,8 @@ import { PositionMenu } from './components/Menus';
 import Table from './components/Table';
 import TopNav from './components/TopNav';
 
+import { getPlayers } from './requests';
+
 import './style/main.css';
 
 export default class App extends Component {
@@ -11,41 +13,20 @@ export default class App extends Component {
     super(props);
 
     this.state = {
+      loading: true,
       showMenu: false,
       position: 'RB',
-      data: [
-        { name: 'Christian McCaffrey', position: 'RB', team: 'CAR' },
-        { name: 'Dalvin Cook', position: 'RB', team: 'MIN' },
-        { name: 'Alvin Kamara', position: 'RB', team: 'NO' },
-        { name: 'Saquon Barkley', position: 'RB', team: 'NYG' },
-        { name: 'Joe Mixon', position: 'RB', team: 'CIN' },
-        { name: 'Josh Jacobs', position: 'RB', team: 'LV' },
-        { name: 'Ezekiel Elliott', position: 'RB', team: 'DAL' },
-        { name: 'Clyde Edwards-Elaire', position: 'RB', team: 'KC' },
-        { name: 'Jonathan Taylor', position: 'RB', team: 'NO' },
-        { name: 'Nick Chubb', position: 'RB', team: 'CLE' },
-        { name: 'DeAndre Hopkins', position: 'WR', team: 'ARI' },
-        { name: 'Michael Thomas', position: 'WR', team: 'NO' },
-        { name: 'Adam Thielen', position: 'WR', team: 'MIN' },
-        { name: 'Calvin Ridley', position: 'WR', team: 'ATL' },
-        { name: 'Devante Adams', position: 'WR', team: 'GB' },
-        { name: 'Tyreek Hill', position: 'WR', team: 'KC' },
-        { name: 'Tyler Lockett', position: 'WR', team: 'SEA' },
-        { name: 'D.K. Metcalf', position: 'WR', team: 'SEA' },
-        { name: 'Robby Anderson', position: 'WR', team: 'CAR' },
-        { name: 'Marquise Brown', position: 'WR', team: 'BAL' },
-        { name: 'Tyler Boyd', position: 'WR', team: 'CIN' },
-        { name: 'Odell Beckham Jr.', position: 'WR', team: 'CLE' },
-        { name: 'Julian Edelman', position: 'WR', team: 'NE' },
-        { name: 'Keenan Allen', position: 'WR', team: 'LAC' },
-        { name: 'Terry Mclaurin', position: 'WR', team: 'WAS' },
-        { name: 'Rex Burkhead', position: 'RB', team: 'NE' },
-        { name: 'David Johnson', position: 'RB', team: 'HOU' },
-        { name: 'Kareem Hunt', position: 'RB', team: 'CLE' },
-        { name: 'Aaron Jones', position: 'RB', team: 'GB' },
-        { name: 'James White', position: 'RB', team: 'NE' }
-      ]
+      data: []
     };
+  };
+
+  async componentDidMount() {
+    const players = await getPlayers();
+    
+    this.setState(() => ({ 
+      loading: false,
+      data: players 
+    }));
   };
 
   toggleMenu = () => {
@@ -66,7 +47,7 @@ export default class App extends Component {
             <Col md={this.state.showMenu ? 9 : null}>
               <Table 
                 columns={['name', 'position', 'team']} 
-                data={this.state.position ? this.state.data.filter(d => d.position === this.state.position) : this.state.data} />
+                data={this.state.data} />
             </Col>
           </Row>
         </Container>
