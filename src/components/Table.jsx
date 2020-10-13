@@ -7,10 +7,12 @@ export default function Table(props) {
   return (
     <BootstrapTable striped bordered hover>
       <thead>
-        {props.columns.map((col) => <th key={col}>{capitalizeWords(col)}</th>)}
+        <tr>
+        {props.columns.map((col) => <th key={col.label}>{capitalizeWords(col.label)}</th>)}
+        </tr> 
       </thead>
       <tbody>
-        {props.data.map(d => <TableRow data={d} columns={props.columns} />)}
+        {props.data.map((d, i) => <TableRow key={i} data={d} columns={props.columns} />)}
       </tbody>
     </BootstrapTable>
   );
@@ -19,7 +21,7 @@ export default function Table(props) {
 function TableRow(props) {
   return (
     <tr>
-      {props.columns.map(col => <td key={col}>{props.data[col]}</td>)}
+      {props.columns.map(col => <td key={col.label}>{col.func(props.data)}</td>)}
     </tr>
   );
 };

@@ -46,7 +46,11 @@ export default class App extends Component {
             {this.state.showMenu ? <Col md={3}><PositionMenu value={this.state.position} onChange={this.setPosition} /></Col> : null}
             <Col md={this.state.showMenu ? 9 : null}>
               <Table 
-                columns={['name', 'position', 'team']} 
+                columns={[
+                  { label: 'name', func: d => `${d.first} ${d.last}`},
+                  { label: 'position', func: d => d.position },
+                  { label: 'team', func: d => d.team }
+                ]}
                 data={this.state.data} />
             </Col>
           </Row>
