@@ -54,9 +54,18 @@ export default class App extends Component {
   setPosition = value => {
     this.setState(() => ({ 
       loading: true,
-      position: value
+      position: value,
+      data: []
     }));
   };
+
+  setSortBy = value => {
+    this.setState(() => ({
+      loading: true,
+      orderBy: value,
+      data: []
+    }));
+  }
 
   render() {
     return (
@@ -68,11 +77,15 @@ export default class App extends Component {
             <Col md={this.state.showMenu ? 9 : null}>
               <Table 
                 columns={[
-                  { label: 'name', func: d => `${d.first} ${d.last}`},
-                  { label: 'position', func: d => d.position },
-                  { label: 'team', func: d => d.team || '-' }
+                  { name: 'name', func: d => `${d.first} ${d.last}`, sortable: true, sortValue: 'last' },
+                  { name: 'position' },
+                  { name: 'team', func: d => d.team_id || '-' },
+                  { name: 'total_rush_yd', label: 'Rush Yd', sortable: true},
+                  { name: 'total_rec_yd', label: 'Rec Yd', sortable: true },
+                  { name: 'total_pass_yd', label: 'Pass Yd', sortable: true }
                 ]}
-                data={this.state.data} />
+                data={this.state.data} 
+                onSort={this.setSortBy}/>
             </Col>
           </Row>
         </Container>

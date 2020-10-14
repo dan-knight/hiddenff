@@ -1,4 +1,5 @@
-export function capitalizeWords(sentence) {
+export function capitalizeSentence(sentence) {
   const capitalize = word => word.charAt(0).toUpperCase() + word.slice(1);
-  return sentence.split(' ').map(w => capitalize(w));
+  const capitalizedWords = sentence.split(' ').map(w => capitalize(w));
+  return capitalizedWords.join(' ');
 };
