@@ -15,9 +15,11 @@ class Database {
     return response['isOk'];
   };
 
-  async getPlayers(orderBy, startNumber, position) {
-    const query = await this.dbInstance.select(['first', 'last', 'position', 'team_id'])
-      .from('players').orderBy(orderBy).where(position ? { position: position } : {})
+  async getPlayers(columns, orderBy, startNumber, position) {
+    const getColumns = () => ['first', 'last', 'position', 'team_id'].concat(JSON.parse(columns));
+
+    const query = await this.dbInstance.select(getColumns())
+      .from('players').orderBy(orderBy, orderBy === 'last' ? 'asc' : 'desc').where(position ? { position: position } : {})
       .limit(20).offset(startNumber);
     return query;
   };
