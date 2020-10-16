@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Col, Container, Row } from 'react-bootstrap';
+import { Button, Col, Container, Row } from 'react-bootstrap';
 import { PositionMenu } from './components/Menus';
 import Table from './components/Table';
 import TopNav from './components/TopNav';
@@ -36,15 +36,19 @@ export default class App extends Component {
   updateData = async () => {
     const players = await this.getPlayerData();
     
-    this.setState(() => ({ 
+    this.setState(prevState => ({ 
       loading: false,
-      data: players 
+      data: prevState.data.concat(players) 
     }));
   };
 
   async getPlayerData() {
     const response = await getPlayers(this.state.data.length, this.state.orderBy, this.state.position);
     return response;
+  };
+
+  loadMorePlayers = () => {
+    this.setState(() => ({ loading: true }));
   };
 
   toggleMenu = () => {
@@ -65,7 +69,7 @@ export default class App extends Component {
       orderBy: value,
       data: []
     }));
-  }
+  };
 
   render() {
     return (
@@ -85,7 +89,11 @@ export default class App extends Component {
                   { name: 'total_pass_yd', label: 'Pass Yd', sortable: true }
                 ]}
                 data={this.state.data} 
-                onSort={this.setSortBy}/>
+                onSort={this.setSortBy}
+                sortBy={this.state.orderBy} />
+              <div align="center">
+                <Button onClick={this.loadMorePlayers}>Show More</Button>
+              </div>
             </Col>
           </Row>
         </Container>

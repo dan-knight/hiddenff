@@ -5,3 +5,19 @@
 body {
   margin-top: 3.5rem;
 }
+
+.sortable {
+  &:hover {
+    cursor: pointer;
+    color: #777;
+  }
+}
+
+.iconButton {
+  fill: #555;
+
+  &:hover {
+    cursor: pointer;
+    fill: black
+  }
+}

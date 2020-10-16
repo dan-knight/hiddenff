@@ -7,10 +7,10 @@ export function PositionMenu(props) {
       title='Position' 
       options={[
         { value: null, label: 'All' },
-        { value: 'QB'},
-        { value: 'RB'},
-        { value: 'WR'},
-        { value: 'TE'}
+        { value: 'QB', label: 'Quarterbacks' },
+        { value: 'RB', label: 'Running Backs' },
+        { value: 'WR', label: 'Wide Receivers' },
+        { value: 'TE', label: 'Tight Ends' }
       ]} 
       value={props.value}
       onChange={props.onChange} />
@@ -24,8 +24,8 @@ function FilterMenu(props) {
   };
 
   return (
-    <div>
-      <h4>{props.title}</h4>
+    <div className='py-3'>
+      <h4 className='mb-3'>{props.title}</h4>
       <ButtonGroup vertical>
         {props.options.map(o => (
           <FilterButton value={o.value} active={o.value === props.value}
@@ -38,5 +38,5 @@ function FilterMenu(props) {
 };
 
 function FilterButton(props) {
-  return <Button onClick={props.onClick} value={props.value} variant={props.active ? 'primary' : 'outline-primary'}>{props.children}</Button>
+  return <Button onClick={props.onClick} value={props.value} variant={props.active ? 'secondary' : 'outline-secondary'}>{props.children}</Button>
 }

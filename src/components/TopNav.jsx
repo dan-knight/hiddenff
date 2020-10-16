@@ -12,8 +12,8 @@ export default function TopNav(props) {
     <Navbar fixed="top" 
       variant={props.color} bg={props.color}>
       <Navbar.Collapse className="collapse w-100 order-0">
-        <div onClick={handleToggle}>
-          <Gear size='1.5' color='black' />
+        <div onClick={handleToggle} className='iconButton'>
+          <Gear size='1.5' />
         </div>
       </Navbar.Collapse>
         <Navbar.Brand href='/'>hiddenFF</Navbar.Brand>

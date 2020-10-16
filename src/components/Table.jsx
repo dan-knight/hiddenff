@@ -2,6 +2,7 @@ import React from 'react';
 
 import { Table as BootstrapTable } from 'react-bootstrap';
 import { capitalizeSentence } from '../utility';
+import { CaretUp } from './Icons';
 
 export default function Table(props) {
   return (
@@ -10,7 +11,7 @@ export default function Table(props) {
         <tr>
           {props.columns.map(col => (
             <HeadCell label={col.label || capitalizeSentence(col.name)} colName={col.name}
-              sortValue={col.sortValue} sortable={col.sortable} onClick={props.onSort}/>))}
+              sortValue={col.sortValue} sortBy={props.sortBy} sortable={col.sortable} onClick={props.onSort}/>))}
         </tr> 
       </thead>
       <tbody>
@@ -21,14 +22,16 @@ export default function Table(props) {
 };
 
 function HeadCell(props) {
+  const sortBy = props.sortValue || props.colName;
+
   function handleClick() {
-    props.onClick(props.sortValue || props.colName);
+    props.onClick(sortBy);
   };
 
   return (
     <th key={props.colName} >
-      <div onClick={props.sortable ? handleClick : null}>
-        {props.label}
+      <div onClick={props.sortable ? handleClick : null} className={props.sortable ? 'sortable' : null}>
+        {sortBy === props.sortBy ? <CaretUp size='0.75' mb='1' /> : null} {props.label}
       </div>
     </th>
   );
