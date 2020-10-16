@@ -17,8 +17,7 @@ async function run() {
   app.use(require('cors')());
 
   app.get('/players', async (req, res) => {
-    const players = await db.getPlayers(req.query.columns, req.query.sortBy, req.query.start * 20, req.query.position);
-    // players.forEach(p => utility.renameKey(p, 'team_id', 'team'));
+    const players = await db.getPlayers(req.query.columns, req.query.sortBy, req.query.start, req.query.position);
 
     res.status(200).json(players);
   });
