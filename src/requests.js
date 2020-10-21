@@ -1,9 +1,11 @@
 const axios = require('axios');
 
+const dbURL = `http://localhost:${process.env.API_PORT}`;
+
 export async function getPlayers(start, sortBy, position) {
   const response = await axios({
     method: 'GET',
-    url: 'http://localhost:3001/players',
+    url: `${dbURL}/players`,
     params: {
       columns: JSON.stringify(['total_rush_yd', 'total_rec_yd', 'total_pass_yd']),
       start: start,
@@ -12,5 +14,5 @@ export async function getPlayers(start, sortBy, position) {
     }
   }).catch(error => { console.log(error); });
 
-  return response.data;
+  return response ? response.data : [];
 };
