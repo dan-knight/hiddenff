@@ -1,6 +1,7 @@
 const axios = require('axios');
 
-const dbURL = `http://localhost:${process.env.API_PORT}`;
+const dbURL = `https://api.hiddenff.com`;
+// const dbURL = 'http://localhost:3000';
 
 export async function getPlayers(start, sortBy, position) {
   const response = await axios({
@@ -14,5 +15,5 @@ export async function getPlayers(start, sortBy, position) {
     }
   }).catch(error => { console.log(error); });
 
-  return response ? response.data : [];
+  return response?.data ?? [];
 };
