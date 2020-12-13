@@ -10,7 +10,7 @@ export default function Table(props) {
       <thead>
         <tr>
           {props.columns.map(col => (
-            <HeadCell label={col.label || capitalizeSentence(col.name)} colName={col.name}
+            <HeadCell label={col.label} colName={col.name}
               sortValue={col.sortValue} sortBy={props.sortBy} sortable={col.sortable} onClick={props.onSort}/>))}
         </tr> 
       </thead>

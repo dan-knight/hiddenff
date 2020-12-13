@@ -1,15 +1,18 @@
 import React from 'react';
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 
 import useAxios from '../hooks/useAxios'
 import useDataStorage from '../hooks/useDataStorage';
 import Table from './Table';
 
-import {columns} from '../data/columns';
+import useColumns from '../hooks/useColumns';
 
 export default function PlayerTable(props) {
   const [loading, error, request] = useAxios();
   const [playerData, updateData, replaceData] = useDataStorage();
+
+  const [allColumns, viewColumns] = useColumns('playerOverview', props.position);
+  const queryColumns = useMemo(() => JSON.stringify(viewColumns.map(c => c.name)), [viewColumns]);
 
   useEffect(function() {
     replacePlayerData();
@@ -19,7 +22,7 @@ export default function PlayerTable(props) {
     const newData = await request({ 
       url: 'http://localhost:3001/players',
       params: {
-        columns: JSON.stringify(['total_rush_yd', 'total_rec_yd', 'total_pass_yd']),
+        columns: queryColumns,
         position: props.position,
         sortBy: props.sortBy,
         start: start
@@ -39,9 +42,7 @@ export default function PlayerTable(props) {
 
   return (
     <div>
-      {/* <button onClick={updatePlayerData}>Update</button>
-      {loading ? 'Loading...' : JSON.stringify(playerData)} */}
-      <Table data={playerData} columns={columns} sortBy={props.sortBy} onSort={props.onSort} />
+      <Table data={playerData} columns={allColumns} sortBy={props.sortBy} onSort={props.onSort} />
     </div>
   ); 
 }

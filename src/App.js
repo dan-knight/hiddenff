@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import { Button, Col, Container, Row } from 'react-bootstrap';
 import { PositionMenu } from './components/Menus';
 import PlayerTable from './components/PlayerTable';
-import Table from './components/Table';
 import TopNav from './components/TopNav';
 
 import { getPlayers } from './requests';
@@ -15,7 +14,7 @@ export default class App extends Component {
 
     this.state = {
       loading: true,
-      position: null,
+      position: ['RB'],
       orderBy: 'last',
       showMenu: false,
       data: []
@@ -80,7 +79,7 @@ export default class App extends Component {
           <Row>
             {this.state.showMenu ? <Col md={3}><PositionMenu value={this.state.position} onChange={this.setPosition} /></Col> : null}
             <Col md={this.state.showMenu ? 9 : null}>
-            <PlayerTable position={this.state.position} sortBy={this.state.orderBy} onSort={this.setSortBy} />
+              <PlayerTable position={this.state.position} sortBy={this.state.orderBy} onSort={this.setSortBy} />
               <div align="center">
                 <Button onClick={this.loadMorePlayers}>Show More</Button>
               </div>

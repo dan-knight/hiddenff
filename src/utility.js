@@ -3,3 +3,7 @@ export function capitalizeSentence(sentence) {
   const capitalizedWords = sentence.split(' ').map(w => capitalize(w));
   return capitalizedWords.join(' ');
 };
+
+export function combineArrays(...arrays) {
+  return [].concat(...arrays);
+};
