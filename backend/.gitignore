@@ -1,6 +1,0 @@
-# Project exclude paths
-/venv/
-/.env
-/scrape/data/
-/geckodriver.log
-
