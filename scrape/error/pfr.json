@@ -1,0 +1,32 @@
+{
+  "player_names": {
+    "Odell Beckham Jr.": "Odell Beckham",
+    "D.J. Chark": "DJ Chark",
+    "Seth DeValve": "Seth Devalve",
+    "Ted Ginn Jr.": "Ted Ginn",
+    "Robert Griffin III": "Robert Griffin",
+    "Patrick Mahomes II": "Patrick Mahomes",
+    "J.J. Nelson": "JJ Nelson",
+    "JoJo Natson": "Jojo Natson",
+    "Steven Sims Jr.": "Steven Sims",
+    "Dan Vitale": "Danny Vitale",
+    "Jeff Wilson Jr.": "Jeff Wilson"
+  },
+  "player_links": {
+    "Patrick Ricard": "/players/R/RicaPa00.htm",
+    "Tremon Smith": "/players/S/SmitTr04.htm",
+    "http://rotoguru1.com/cgi-bin/playrf.cgi?1450": "/players/G/GrifRy01.htm",
+    "http://rotoguru1.com/cgi-bin/playrf.cgi?4592": "/players/G/GrifRy00.htm"
+  },
+  "data": {
+    "Peyton Barber": {
+      "birthday": "1994-06-27"
+    },
+    "Kenjon Barner": {
+      "birthday": "1989-04-28"
+    },
+    "Zach Line": {
+      "birthday": "1990-04-26"
+    }
+  }
+}
