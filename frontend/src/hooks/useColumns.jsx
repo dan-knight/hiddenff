@@ -8,7 +8,7 @@ export default function useColumns(page, positions) {
   const pageColumns = columns[page];
 
   function combineColumns() {
-    const s = new Set([...positions.map(pos => [].concat(...pageColumns[pos]))]);
+    const s = new Set(combineArrays(...positions.map(p => pageColumns[p])));
     return combineArrays(...s);
   };
 

@@ -11,11 +11,12 @@ export default function Table(props) {
         <tr>
           {props.columns.map(col => (
             <HeadCell label={col.label} colName={col.name}
-              sortValue={col.sortValue} sortBy={props.sortBy} sortable={col.sortable} onClick={props.onSort}/>))}
+              sortValue={col.sortValue} sortBy={props.sortBy} sortable={col.sortable} 
+              onClick={props.onSort} key={col.name} />))}
         </tr> 
       </thead>
       <tbody>
-        {props.data.map((d, i) => <TableRow key={i} data={d} columns={props.columns} />)}
+        {props.data.map(d => <TableRow key={d.id} data={d} columns={props.columns} />)}
       </tbody>
     </BootstrapTable>
   );
@@ -40,7 +41,7 @@ function HeadCell(props) {
 function TableRow(props) {
   return (
     <tr>
-      {props.columns.map(col => <td key={col.label}>{col.func ? col.func(props.data) : props.data[col.name]}</td>)}
+      {props.columns.map(col => <td key={col.name}>{col.func ? col.func(props.data) : props.data[col.name]}</td>)}
     </tr>
   );
 };

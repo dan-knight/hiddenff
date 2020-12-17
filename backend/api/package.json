@@ -17,7 +17,5 @@
     "knex-utils": "^4.1.7",
     "mysql2": "^2.2.5"
   },
-  "devDependencies": {
-    "nodemon": "^2.0.4"
-  }
+  "devDependencies": {}
 }

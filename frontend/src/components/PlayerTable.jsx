@@ -11,19 +11,19 @@ export default function PlayerTable(props) {
   const [loading, error, request] = useAxios();
   const [playerData, updateData, replaceData] = useDataStorage();
 
-  const [allColumns, viewColumns] = useColumns('playerOverview', props.position);
+  const [allColumns, viewColumns] = useColumns('playerOverview', props.positions);
   const queryColumns = useMemo(() => JSON.stringify(viewColumns.map(c => c.name)), [viewColumns]);
 
   useEffect(function() {
     replacePlayerData();
-  }, [props.position, props.sortBy]);
+  }, [props.positions, props.sortBy]);
 
   async function getPlayerData(start=0) {
     const newData = await request({ 
       url: 'http://localhost:3001/players',
       params: {
         columns: queryColumns,
-        position: props.position,
+        positions: JSON.stringify(props.positions),
         sortBy: props.sortBy,
         start: start
       }

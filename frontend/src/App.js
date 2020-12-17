@@ -9,7 +9,7 @@ import { getPlayers } from './requests';
 import './style/main.css';
 
 export default function App() {
-  const [position, setPosition] = useState(['RB']);
+  const [positions, setPositions] = useState(['RB']);
   const [sortBy, setSortBy] = useState('last');
   const [showMenu, setShowMenu] = useState(false);
 
@@ -18,8 +18,8 @@ export default function App() {
     setShowMenu(!showMenu);
   };
 
-  function changePosition(value) {
-    setPosition([value]);
+  function changePositions(value) {
+    setPositions(value);
   };
 
   function changeSortBy(value) {
@@ -31,9 +31,9 @@ export default function App() {
       <TopNav color='light' onToggle={toggleMenu}/>
       <Container fluid={showMenu}>
         <Row>
-          {showMenu ? <Col md={3}><PositionMenu value={position} onChange={changePosition} /></Col> : null}
+          {showMenu ? <Col md={3}><PositionMenu value={positions} onChange={changePositions} /></Col> : null}
           <Col md={showMenu ? 9 : null}>
-            <PlayerTable position={position} sortBy={sortBy} onSort={changeSortBy} />
+            <PlayerTable positions={positions} sortBy={sortBy} onSort={changeSortBy} />
           </Col>
         </Row>
       </Container>

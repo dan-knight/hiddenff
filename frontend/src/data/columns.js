@@ -32,12 +32,11 @@ const totalPassYdPerCmp = { name: 'total_pass_yd_per_cmp', label: 'Pass Yd Per C
 
 const rushColumns = [totalRushAtt, totalRushYd, totalRushTD, totalRushYdPerAtt];
 const recColumns = [totalTgt, totalRec, totalRecYd, totalRecTD, totalRecYdPerRec]
-const passColumns = [totalPassYd];
+const passColumns = [totalPassAtt, totalPassCmp, totalPassYd, totalPassTD, totalPassYdPerCmp];
 
 const playerOverviewColumns = {
   basic: [playerName, position, playerTeam],
-  all: [rushColumns, recColumns, passColumns],
-  QB: [rushColumns, passColumns],
+  QB: [passColumns, rushColumns],
   RB: [rushColumns, recColumns],
   WR: [recColumns],
   TE: [recColumns]

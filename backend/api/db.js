@@ -1,5 +1,4 @@
 const knexUtils = require('knex-utils');
-
 const heartbeatChecker = require('knex-utils').heartbeatChecker;
 
 class Database {
@@ -15,11 +14,22 @@ class Database {
     return response['isOk'];
   };
 
-  async getPlayers(columns, orderBy, startNumber, position) {
-    const getColumns = () => ['first', 'last', 'position', 'team_id'].concat(JSON.parse(columns));
+  async getPlayers(columns, orderBy, startNumber, positions) {
+    const getColumns = () => ['id', 'first', 'last', 'position', 'team_id'].concat(columns);
 
     const query = await this.dbInstance.select(getColumns())
-      .from('players').orderBy(orderBy, orderBy === 'last' ? 'asc' : 'desc').where(position ? { position: position } : {})
+      .from('players').orderBy(orderBy, orderBy === 'last' ? 'asc' : 'desc')
+      .where(builder => {
+        const length = positions.length;
+
+        if (length < 3) {
+          builder.whereIn('position', positions);
+        } else if (length > 3) {
+          builder.whereNotIn('position', []);
+        } else {
+          builder.whereNotIn('position', ['QB', 'RB', 'WR', 'TE'].filter(p => !positions.includes(p)));
+        };
+      })
       .limit(20).offset(startNumber);
     return query;
   };

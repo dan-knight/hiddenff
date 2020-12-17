@@ -6,7 +6,7 @@ export function PositionMenu(props) {
     <FilterMenu
       title='Position' 
       options={[
-        { value: null, label: 'All' },
+        { value: ['QB', 'RB', 'WR', 'TE'], label: 'All' },
         { value: 'QB', label: 'Quarterbacks' },
         { value: 'RB', label: 'Running Backs' },
         { value: 'WR', label: 'Wide Receivers' },
@@ -20,7 +20,7 @@ export function PositionMenu(props) {
 function FilterMenu(props) {
   function handleChange(event) {
     event.preventDefault();
-    props.onChange(event.target.value);
+    props.onChange(event.target.value.split(','));
   };
 
   return (

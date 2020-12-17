@@ -17,7 +17,7 @@ async function run() {
   app.use(require('cors')());
 
   app.get('/players', async (req, res) => {
-    const players = await db.getPlayers(req.query.columns, req.query.sortBy, req.query.start, req.query.position);
+    const players = await db.getPlayers(JSON.parse(req.query.columns), req.query.sortBy, req.query.start, JSON.parse(req.query.positions));
 
     res.status(200).json(players);
   });
