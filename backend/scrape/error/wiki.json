@@ -26,5 +26,8 @@
     "StubHub Center": "Dignity Health Sports Park",
     "TIAA Bank Stadium": "TIAA Bank Field",
     "Ring Central Coliseum": "Oakland Coliseum"
+  },
+  "stadium_links": {
+    "https://www.pro-football-reference.com/stadiums/SEA00.htm": "https://en.wikipedia.org/wiki/Lumen_Field"
   }
 }

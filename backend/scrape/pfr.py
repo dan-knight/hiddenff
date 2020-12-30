@@ -55,7 +55,10 @@ class PlayerListScraper(RequestsScraper):
             link = ''
 
             def get_name_matches():
-                return self.container.find_all('a', text=name)
+                def element_matches(element):
+                    return element.name == 'a' and element.text.strip(' ') == name
+
+                return self.container.find_all(element_matches)
 
             def get_href(a):
                 return prepend_link(a['href'])
@@ -575,18 +578,29 @@ def scrape_player(link, season_week_pairs):
 
         return player_scraper
 
-    def add_season(scraper, season_):
-        scraper.scrape_game_stats(season_week_pairs[season_])
+    def scrape_games():
+        games_scraped = False
 
-        if scraper.data['games'][scraper.season]:
-            player['games'].update(scraper.data['games'])
+        def add_season(scraper, season_):
+            nonlocal games_scraped
 
-    first_scraper = add_basic_info()
-    add_season(first_scraper, first_season)
+            scraper.scrape_game_stats(season_week_pairs[season_])
 
-    for season in seasons:
-        game_scraper = PlayerPageScraper(link, season)
-        add_season(game_scraper, season)
+            if scraper.data['games'][scraper.season]:
+                player['games'].update(scraper.data['games'])
+                games_scraped = True
+
+        first_scraper = add_basic_info()
+        add_season(first_scraper, first_season)
+
+        for season in seasons:
+            game_scraper = PlayerPageScraper(link, season)
+            add_season(game_scraper, season)
+
+        if not games_scraped:
+            player['games'] = {}
+
+    scrape_games()
 
     return player
 

@@ -35,6 +35,15 @@ def try_data_then_kwargs(stat_name, data, **kwargs):
     return value
 
 
+def combine_dicts(dicts):
+    combined = {}
+
+    for d in dicts:
+        combined.update(d)
+
+    return combined
+
+
 # Keys
 def get_team_keys():
     teams = {}
@@ -69,7 +78,7 @@ def get_team_keys():
     teams.update(dict.fromkeys(['Seattle Seahawks', 'SEA'], 'SEA'))
     teams.update(dict.fromkeys(['Tampa Bay Buccaneers', 'TB', 'TAM'], 'TB'))
     teams.update(dict.fromkeys(['Tennessee Titans', 'TEN'], 'TEN'))
-    teams.update(dict.fromkeys(['Washington Redskins', 'WAS'], 'WAS'))
+    teams.update(dict.fromkeys(['Washington Redskins', 'Washington Football Team', 'WAS'], 'WAS'))
     teams.update(dict.fromkeys(['Free agent', ''], None))
 
     return teams

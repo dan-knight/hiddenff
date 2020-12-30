@@ -23,8 +23,18 @@ def scrape_players_and_export(season_week_pairs=None):
 
     guru_links_and_names = guru.get_player_links_and_names(season_week_pairs)
 
+    def get_players():
+        players = []
+
+        for link, name in guru_links_and_names.items():
+            player = scrape_player(link, season_week_pairs, name)
+            if player:
+                players.append(player)
+
+        return players
+
     data = {
-        'players': [scrape_player(link, season_week_pairs, name) for link, name in guru_links_and_names.items()]
+        'players': get_players()
     }
 
     export_scrape('player-scrape', data)
@@ -98,7 +108,7 @@ def scrape_player(guru_link, season_week_pairs, name=None):
         check_errors()
         return scraped_data
 
-    return combine_scraped_data()
+    return combine_scraped_data() if pfr_data['games'] else None
 
 
 def scrape_games_and_export(weeks=current_week, season=current_season):
@@ -140,18 +150,21 @@ def scrape_stadium(pfr_link):
     links = {pfr_data['url']}
     errors = pfr_data['errors'].copy()
 
-    def get_most_recent_name():
-        name = pfr_data['names'][-1]['name']
-        try:
-            name = wiki.errors['stadium_names'][name]
-        except KeyError:
-            pass
+    def get_wiki_link():
+        def get_most_recent_name():
+            name = pfr_data['names'][-1]['name']
 
-        return name
+            try:
+                name = wiki.errors['stadium_names'][name]
+            except KeyError:
+                pass
 
-    most_recent_name = get_most_recent_name()
-    wiki_link = wiki.get_stadium_link(most_recent_name)
+            return name
 
+        error_link = wiki.errors['stadium_links'].get(pfr_link)
+        return error_link if error_link else wiki.get_stadium_link(get_most_recent_name())
+
+    wiki_link = get_wiki_link()
     wiki_data = {}
 
     if wiki_link:
@@ -160,6 +173,20 @@ def scrape_stadium(pfr_link):
         errors.update(wiki_data['errors'])
     else:
         errors.add('wiki_link')
+
+    def check_errors():
+        def check_teams():
+            if 'teams' in errors:
+                try:
+                    wiki_data.update({'teams': wiki.errors['stadium_teams'][pfr_link]})
+                    errors.remove('teams')
+                except KeyError:
+                    pass
+
+        if errors:
+            check_teams()
+
+    check_errors()
 
     return {'links': list(links),
             'names': pfr_data.get('names'),
@@ -232,30 +259,7 @@ def get_scraped_stadium_links_from_games(filename):
 
 
 if __name__ == '__main__':
-    #guru_list_url = 'http://rotoguru1.com/cgi-bin/fstats.cgi?pos=0&sort=1&game=p&colA=0&daypt=0&xavg=0&inact=0&maxprc=99999&outcsv=0'
-
-    # players = import_scrape('player-scrape_2020-05-01_18-03-11.json')['players']
-    # games = import_scrape('game-scrape_2020-05-15_19-41-29.json')['games']
-    # teams = import_scrape('teams')
-    # stadiums = import_scrape('stadium-scrape_2020-05-12_10-15-21.json')['stadiums']
-    #
-    # # db.reset_tables()
-    #
-    # db.update_from_scraped({'teams': teams,
-    #                         'games': games,
-    #                         'players': players,
-    #                         'stadiums': stadiums})
-    #
     # db.calculate_stats()
+    # scrape_players_and_export({2019: [i + 1 for i in range(11)]})
 
-    # close_driver()
-    # db.session.commit()
-
-    scrape_players_and_export(dict.fromkeys(range(2014, 2019 + 1), range(1, 17 + 1)))
-    close_driver()
-
-    # for player in import_scrape('')['players']:
-    #     if player['errors']:
-    #         print(player)
-
-
+    db.reset_tables()
