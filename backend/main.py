@@ -23,18 +23,8 @@ def scrape_players_and_export(season_week_pairs=None):
 
     guru_links_and_names = guru.get_player_links_and_names(season_week_pairs)
 
-    def get_players():
-        players = []
-
-        for link, name in guru_links_and_names.items():
-            player = scrape_player(link, season_week_pairs, name)
-            if player:
-                players.append(player)
-
-        return players
-
     data = {
-        'players': get_players()
+        'players': [scrape_player(link, season_week_pairs, name) for link, name in guru_links_and_names.items()]
     }
 
     export_scrape('player-scrape', data)
@@ -108,7 +98,7 @@ def scrape_player(guru_link, season_week_pairs, name=None):
         check_errors()
         return scraped_data
 
-    return combine_scraped_data() if pfr_data['games'] else None
+    return combine_scraped_data()
 
 
 def scrape_games_and_export(weeks=current_week, season=current_season):
@@ -260,6 +250,6 @@ def get_scraped_stadium_links_from_games(filename):
 
 if __name__ == '__main__':
     # db.calculate_stats()
-    # scrape_players_and_export({2019: [i + 1 for i in range(11)]})
-
-    db.reset_tables()
+    scrape_players_and_export({2019: [i + 1 for i in range(11)]})
+    #
+    # db.reset_tables()

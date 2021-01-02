@@ -579,16 +579,12 @@ def scrape_player(link, season_week_pairs):
         return player_scraper
 
     def scrape_games():
-        games_scraped = False
 
         def add_season(scraper, season_):
-            nonlocal games_scraped
-
             scraper.scrape_game_stats(season_week_pairs[season_])
 
             if scraper.data['games'][scraper.season]:
                 player['games'].update(scraper.data['games'])
-                games_scraped = True
 
         first_scraper = add_basic_info()
         add_season(first_scraper, first_season)
@@ -596,9 +592,6 @@ def scrape_player(link, season_week_pairs):
         for season in seasons:
             game_scraper = PlayerPageScraper(link, season)
             add_season(game_scraper, season)
-
-        if not games_scraped:
-            player['games'] = {}
 
     scrape_games()
 
