@@ -101,21 +101,27 @@ def scrape_player(guru_link, season_week_pairs, name=None):
     return combine_scraped_data()
 
 
-def scrape_games_and_export(weeks=current_week, season=current_season):
-    def get_pfr_links(weeks_to_scrape):
+def scrape_games_and_export(season_week_pairs=None):
+    if season_week_pairs is None:
+        season_week_pairs = {current_season: [current_week]}
+
+    def get_pfr_season_links(season, weeks):
         links = []
+
         try:
-            for week in weeks_to_scrape:
-                links += pfr.get_game_links(week, season)
+            links = {week: pfr.get_game_links(week, season) for week in weeks}
         except TypeError:
-            links = get_pfr_links([weeks_to_scrape])
+            links = get_pfr_season_links(season, [weeks])
 
         return links
 
-    pfr_links = get_pfr_links(weeks)
+    pfr_links = {season: get_pfr_season_links(season, weeks) for season, weeks in season_week_pairs.items()}
+
+    def scrape_season(season):
+        return {week: [scrape_game(link) for link in links] for week, links in season.items()}
 
     data = {
-        'games': [scrape_game(link) for link in pfr_links]
+        'games': {year: scrape_season(weeks) for year, weeks in pfr_links.items()}
     }
 
     export_scrape('game-scrape', data)
@@ -250,6 +256,6 @@ def get_scraped_stadium_links_from_games(filename):
 
 if __name__ == '__main__':
     # db.calculate_stats()
-    scrape_players_and_export({2019: [i + 1 for i in range(11)]})
+    scrape_games_and_export({2019: 1})
     #
     # db.reset_tables()
