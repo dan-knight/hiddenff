@@ -105,26 +105,54 @@ def scrape_games_and_export(season_week_pairs=None):
     if season_week_pairs is None:
         season_week_pairs = {current_season: [current_week]}
 
-    def get_pfr_season_links(season, weeks):
+    def get_pfr_links():
         links = []
 
-        try:
-            links = {week: pfr.get_game_links(week, season) for week in weeks}
-        except TypeError:
-            links = get_pfr_season_links(season, [weeks])
+        for season, weeks in season_week_pairs.items():
+            weeks_to_scrape = weeks if isinstance(weeks, list) else [weeks]
+
+            def get_pfr_season_links():
+                season_links = []
+
+                for week in weeks_to_scrape:
+                    season_links += pfr.get_game_links(week, season)
+
+                return season_links
+
+            links += get_pfr_season_links()
 
         return links
 
-    pfr_links = {season: get_pfr_season_links(season, weeks) for season, weeks in season_week_pairs.items()}
+    def scrape_games(links):
+        games = {}
 
-    def scrape_season(season):
-        return {week: [scrape_game(link) for link in links] for week, links in season.items()}
+        for link in links:
+            game = scrape_game(link)
 
-    data = {
-        'games': {year: scrape_season(weeks) for year, weeks in pfr_links.items()}
-    }
+            season = game.pop('season')
+            week = game.pop('week')
 
-    export_scrape('game-scrape', data)
+            def add_game_data():
+                try:
+                    season_data = games[season]
+
+                    def add_game():
+                        try:
+                            week_data = season_data[week]
+                            week_data.append(game)
+                        except KeyError:
+                            season_data[week] = [game]
+
+                    add_game()
+
+                except KeyError:
+                    games[season] = {week: [game]}
+
+            add_game_data()
+
+        return games
+
+    export_scrape('game-scrape', {'games': scrape_games(get_pfr_links())})
 
 
 def scrape_game(pfr_link):
@@ -255,7 +283,5 @@ def get_scraped_stadium_links_from_games(filename):
 
 
 if __name__ == '__main__':
-    # db.calculate_stats()
-    scrape_games_and_export({2019: 1})
-    #
-    # db.reset_tables()
+    scrape_games_and_export({2019: [i + 1 for i in range(11)]})
+    close_driver()
