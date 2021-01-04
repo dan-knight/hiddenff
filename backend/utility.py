@@ -35,7 +35,7 @@ def try_data_then_kwargs(stat_name, data, **kwargs):
     return value
 
 
-def combine_dicts(dicts):
+def combine_dicts(*args):
     combined = {}
 
     def add(new):
@@ -70,7 +70,7 @@ def combine_dicts(dicts):
             else:
                 overwrite_value()
 
-    for d in dicts:
+    for d in args:
         add(d)
 
     return combined
