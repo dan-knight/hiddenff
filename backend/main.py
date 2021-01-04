@@ -2,6 +2,7 @@ from scrape import pfr
 from scrape import guru
 from scrape import wiki
 from scrape.base import close_driver
+from scrape import scrape_player, scrape_game
 
 from db import db
 
@@ -17,11 +18,12 @@ import datetime as dt
 
 
 # Scraping
-def scrape_players_and_export(season_week_pairs=None):
+def scrape_players_and_export(season_week_pairs=None, guru_links_and_names=None):
     if season_week_pairs is None:
         season_week_pairs = {current_season: [current_week]}
 
-    guru_links_and_names = guru.get_player_links_and_names(season_week_pairs)
+    if guru_links_and_names is None:
+        guru_links_and_names = guru.get_player_links_and_names(season_week_pairs)
 
     data = {
         'players': [scrape_player(link, season_week_pairs, name) for link, name in guru_links_and_names.items()]
@@ -30,98 +32,30 @@ def scrape_players_and_export(season_week_pairs=None):
     export_scrape('player-scrape', data)
 
 
-def scrape_player(guru_link, season_week_pairs, name=None):
-    guru_data = guru.scrape_player(guru_link, name)
-
-    def get_pfr_link():
-        link = pfr.get_player_link(guru_data['first'], guru_data['last'], list(season_week_pairs))
-
-        if not link:
-            link = pfr.prepend_link(pfr.errors['player_links'].get(guru_link))
-
-        return link
-
-    pfr_link = get_pfr_link()
-
-    def get_pfr_data():
-        return pfr.scrape_player(pfr_link, season_week_pairs) if pfr_link else {'url': pfr_link,
-                                                                                'errors': {'pfr_link'}}
-
-    pfr_data = get_pfr_data()
-
-    def combine_scraped_data():
-        scraped_data = {
-            'links': [guru_data['url'], pfr_link],
-            'first': guru_data['first'],
-            'last': guru_data['last'],
-            'position': guru_data['position'],
-            'team': pfr_data.get('team'),
-            'birthday': pfr_data.get('birthday'),
-            'games': pfr_data.get('games'),
-        }
-
-        def check_data_errors():
-            full_name = '%s %s' % (scraped_data['first'], scraped_data['last'])
-
-            def update_from_errors(errors):
-                scraped_data.update(errors['data'].get(full_name, {}))
-
-            update_from_errors(pfr.errors)
-
-        check_data_errors()
-
-        def check_errors():
-            def combine_errors():
-                all_errors = guru_data['errors']
-                all_errors.update(pfr_data['errors'])
-                return all_errors
-
-            errors = combine_errors()
-
-            if errors:
-                wiki_links = wiki.get_player_links(scraped_data['first'], scraped_data['last'], scraped_data['position'])
-                for link in wiki_links:
-                    wiki_data = wiki.scrape_player(link)
-
-                    if wiki_data['birthday'] == scraped_data['birthday']:
-                        def update_scraped_data():
-                            for error in errors.copy():
-                                if wiki_data.get(error):
-                                    scraped_data.update({error: wiki_data[error]})
-                                    errors.remove(error)
-
-                        update_scraped_data()
-                        break
-
-            scraped_data.update({'errors': list(errors)})
-
-        check_errors()
-        return scraped_data
-
-    return combine_scraped_data()
-
-
-def scrape_games_and_export(season_week_pairs=None):
-    if season_week_pairs is None:
-        season_week_pairs = {current_season: [current_week]}
-
+def scrape_games_and_export(season_week_pairs=None, pfr_links=None):
     def get_pfr_links():
-        links = []
+        def scrape_links():
+            links = []
 
-        for season, weeks in season_week_pairs.items():
-            weeks_to_scrape = weeks if isinstance(weeks, list) else [weeks]
+            for season, weeks in season_week_pairs.items():
+                weeks_to_scrape = weeks if isinstance(weeks, list) else [weeks]
 
-            def get_pfr_season_links():
-                season_links = []
+                def get_pfr_season_links():
+                    season_links = []
 
-                for week in weeks_to_scrape:
-                    season_links += pfr.get_game_links(week, season)
+                    for week in weeks_to_scrape:
+                        season_links += pfr.get_game_links(week, season)
 
-                return season_links
+                    return season_links
 
-            links += get_pfr_season_links()
+                links += get_pfr_season_links()
 
-        return links
+            return links
+
+        def format_links():
+            return pfr_links if isinstance(pfr_links, list) else [pfr_links]
+
+        return format_links() if pfr_links is not None else scrape_links()
 
     def scrape_games(links):
         games = {}
@@ -153,13 +87,6 @@ def scrape_games_and_export(season_week_pairs=None):
         return games
 
     export_scrape('game-scrape', {'games': scrape_games(get_pfr_links())})
-
-
-def scrape_game(pfr_link):
-    pfr_game = pfr.scrape_game(pfr_link)
-    pfr_game['errors'] = list(pfr_game['errors'])
-
-    return pfr_game
 
 
 def scrape_stadiums_and_export(pfr_links):
@@ -283,5 +210,5 @@ def get_scraped_stadium_links_from_games(filename):
 
 
 if __name__ == '__main__':
-    scrape_games_and_export({2019: [i + 1 for i in range(11)]})
+    scrape_games_and_export({2019: 1})
     close_driver()
