@@ -80,3 +80,53 @@ def scrape_game(pfr_link):
 
     return pfr_game
 
+
+def scrape_stadium(pfr_link):
+    pfr_data = pfr.scrape_stadium(pfr_link)
+
+    links = {pfr_data['url']}
+    errors = pfr_data['errors'].copy()
+
+    def get_wiki_link():
+        def get_most_recent_name():
+            name = pfr_data['names'][-1]['name']
+
+            try:
+                name = wiki.errors['stadium_names'][name]
+            except KeyError:
+                pass
+
+            return name
+
+        error_link = wiki.errors['stadium_links'].get(pfr_link)
+        return error_link if error_link else wiki.get_stadium_link(get_most_recent_name())
+
+    wiki_link = get_wiki_link()
+    wiki_data = {}
+
+    if wiki_link:
+        wiki_data = wiki.scrape_stadium(wiki_link)
+        links.add(wiki_data['url'])
+        errors.update(wiki_data['errors'])
+    else:
+        errors.add('wiki_link')
+
+    def check_errors():
+        def check_teams():
+            if 'teams' in errors:
+                try:
+                    wiki_data.update({'teams': wiki.errors['stadium_teams'][pfr_link]})
+                    errors.remove('teams')
+                except KeyError:
+                    pass
+
+        if errors:
+            check_teams()
+
+    check_errors()
+
+    return {'links': list(links),
+            'names': pfr_data.get('names'),
+            'surfaces': pfr_data.get('surfaces'),
+            'teams': wiki_data.get('teams'),
+            'errors': list(errors)}

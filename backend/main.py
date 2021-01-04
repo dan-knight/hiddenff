@@ -1,8 +1,7 @@
 from scrape import pfr
 from scrape import guru
-from scrape import wiki
 from scrape.base import close_driver
-from scrape import scrape_player, scrape_game
+from scrape import scrape_player, scrape_game, scrape_stadium
 
 from db import db
 
@@ -30,6 +29,8 @@ def scrape_players(season_week_pairs=None, guru_links_and_names=None):
 
 
 def scrape_games(season_week_pairs=None, pfr_links=None):
+    stadium_links = set()
+
     def get_pfr_links():
         def scrape_links():
             links = []
@@ -63,6 +64,8 @@ def scrape_games(season_week_pairs=None, pfr_links=None):
             season = game.pop('season')
             week = game.pop('week')
 
+            stadium_links.add(game['stadium_link'])
+
             def add_game_data():
                 try:
                     season_data = games[season]
@@ -83,70 +86,23 @@ def scrape_games(season_week_pairs=None, pfr_links=None):
 
         return games
 
-    return {'games': get_game_data(get_pfr_links())}
+    game_data = get_game_data(get_pfr_links())
+    stadium_data = scrape_stadiums(stadium_links)
+
+    return {'games': game_data,
+            'stadiums': stadium_data}
 
 
-def scrape_stadiums_and_export(pfr_links):
+def scrape_stadiums(pfr_links):
     return {'stadiums': [scrape_stadium(link) for link in pfr_links]}
 
 
-def scrape_stadium(pfr_link):
-    pfr_data = pfr.scrape_stadium(pfr_link)
-
-    links = {pfr_data['url']}
-    errors = pfr_data['errors'].copy()
-
-    def get_wiki_link():
-        def get_most_recent_name():
-            name = pfr_data['names'][-1]['name']
-
-            try:
-                name = wiki.errors['stadium_names'][name]
-            except KeyError:
-                pass
-
-            return name
-
-        error_link = wiki.errors['stadium_links'].get(pfr_link)
-        return error_link if error_link else wiki.get_stadium_link(get_most_recent_name())
-
-    wiki_link = get_wiki_link()
-    wiki_data = {}
-
-    if wiki_link:
-        wiki_data = wiki.scrape_stadium(wiki_link)
-        links.add(wiki_data['url'])
-        errors.update(wiki_data['errors'])
-    else:
-        errors.add('wiki_link')
-
-    def check_errors():
-        def check_teams():
-            if 'teams' in errors:
-                try:
-                    wiki_data.update({'teams': wiki.errors['stadium_teams'][pfr_link]})
-                    errors.remove('teams')
-                except KeyError:
-                    pass
-
-        if errors:
-            check_teams()
-
-    check_errors()
-
-    return {'links': list(links),
-            'names': pfr_data.get('names'),
-            'surfaces': pfr_data.get('surfaces'),
-            'teams': wiki_data.get('teams'),
-            'errors': list(errors)}
-
-
 def get_scraped_errors(filename):
-    data = import_scrape(filename)
+    scraped_data = import_scrape(filename)
     errors = {}
 
-    for key in data.keys():
-        errors[key] = [x for x in data[key] if x.get('errors')]
+    for scrape_type, data in scraped_data.items():
+        errors[scrape_type] = [d for d in data if d.get('errors')]
 
     return errors
 
@@ -163,15 +119,12 @@ def print_scraped_errors(filename):
         print()
 
 
-def export_scrape(data):
+def export_scrape(*args):
     filename = '%s_%s%s' % ('scrape', get_timestamp(), '.json')
     export_path = './scrape/data/' + filename
 
-    def format_data():
-        return combine_dicts(data) if isinstance(data, list) else data
-
     with open(export_path, 'w') as file:
-        json.dump(format_data(), file)
+        json.dump(combine_dicts(args), file)
 
 
 # Utilities
@@ -196,19 +149,14 @@ def import_scrape(filename):
         return json.load(file)
 
 
-def get_scraped_stadium_links_from_games(filename):
-    games = import_scrape(filename)['games']
-    links = set()
-
-    for game in games:
-        links.add(game['stadium_link'])
-
-    return links
-
-
 if __name__ == '__main__':
-    scrape_games({2019: 1})
+    timeframe = {2019: [i + 1 for i in range(11)]}
+
+    game_data = scrape_games(timeframe)
+    player_data = scrape_players(timeframe)
     close_driver()
+
+    export_scrape(player_data, game_data)
 
 
 
