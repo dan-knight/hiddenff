@@ -38,8 +38,40 @@ def try_data_then_kwargs(stat_name, data, **kwargs):
 def combine_dicts(dicts):
     combined = {}
 
+    def add(new):
+        for new_key, new_value in new.items():
+            if new_value is None:
+                continue
+
+            old_value = combined.get(new_key)
+
+            def overwrite_value():
+                combined[new_key] = new_value
+
+            def add_to_list(list_values, data_to_add, insert_index=None):
+                def get_insert_index():
+                    return len(list_values) if insert_index is None else insert_index
+
+                if isinstance(data_to_add, list):
+                    list_values.extend(data_to_add)
+                else:
+                    list_values.insert(get_insert_index(), data_to_add)
+
+                combined[new_key] = list_values
+
+            if old_value is None:
+                overwrite_value()
+            elif isinstance(old_value, list):
+                add_to_list(old_value, new_value)
+            elif isinstance(old_value, dict) and isinstance(new_value, dict):
+                old_value.update(new_value)
+            elif isinstance(new_value, list):
+                add_to_list(new_value, old_value, 0)
+            else:
+                overwrite_value()
+
     for d in dicts:
-        combined.update(d)
+        add(d)
 
     return combined
 

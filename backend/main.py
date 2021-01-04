@@ -8,6 +8,7 @@ from db import db
 
 import learn
 from config import current_season, current_week
+from utility import combine_dicts
 
 import json
 import re
@@ -18,21 +19,17 @@ import datetime as dt
 
 
 # Scraping
-def scrape_players_and_export(season_week_pairs=None, guru_links_and_names=None):
+def scrape_players(season_week_pairs=None, guru_links_and_names=None):
     if season_week_pairs is None:
         season_week_pairs = {current_season: [current_week]}
 
     if guru_links_and_names is None:
         guru_links_and_names = guru.get_player_links_and_names(season_week_pairs)
 
-    data = {
-        'players': [scrape_player(link, season_week_pairs, name) for link, name in guru_links_and_names.items()]
-    }
-
-    export_scrape('player-scrape', data)
+    return {'players', [scrape_player(link, season_week_pairs, name) for link, name in guru_links_and_names.items()]}
 
 
-def scrape_games_and_export(season_week_pairs=None, pfr_links=None):
+def scrape_games(season_week_pairs=None, pfr_links=None):
     def get_pfr_links():
         def scrape_links():
             links = []
@@ -57,7 +54,7 @@ def scrape_games_and_export(season_week_pairs=None, pfr_links=None):
 
         return format_links() if pfr_links is not None else scrape_links()
 
-    def scrape_games(links):
+    def get_game_data(links):
         games = {}
 
         for link in links:
@@ -86,13 +83,11 @@ def scrape_games_and_export(season_week_pairs=None, pfr_links=None):
 
         return games
 
-    export_scrape('game-scrape', {'games': scrape_games(get_pfr_links())})
+    return {'games': get_game_data(get_pfr_links())}
 
 
 def scrape_stadiums_and_export(pfr_links):
-    data = {'stadiums': [scrape_stadium(link) for link in pfr_links]}
-
-    export_scrape('stadium-scrape', data)
+    return {'stadiums': [scrape_stadium(link) for link in pfr_links]}
 
 
 def scrape_stadium(pfr_link):
@@ -168,13 +163,15 @@ def print_scraped_errors(filename):
         print()
 
 
-def export_scrape(filename, data):
-    name, suffix = split_filename_type(filename, 'json')
-    filename = '%s_%s%s' % (name, get_timestamp(), suffix)
+def export_scrape(data):
+    filename = '%s_%s%s' % ('scrape', get_timestamp(), '.json')
     export_path = './scrape/data/' + filename
 
+    def format_data():
+        return combine_dicts(data) if isinstance(data, list) else data
+
     with open(export_path, 'w') as file:
-        json.dump(data, file)
+        json.dump(format_data(), file)
 
 
 # Utilities
@@ -210,5 +207,8 @@ def get_scraped_stadium_links_from_games(filename):
 
 
 if __name__ == '__main__':
-    scrape_games_and_export({2019: 1})
+    scrape_games({2019: 1})
     close_driver()
+
+
+
