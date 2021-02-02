@@ -1,8 +1,4 @@
-import React, { Component, useState } from 'react';
-import { Button, Col, Container, Row } from 'react-bootstrap';
-import { PositionMenu } from './components/Menus';
-import PlayerTable from './components/PlayerTable';
-import TopNav from './components/TopNav';
+import React, { useState } from 'react';
 
 import { getPlayers } from './requests';
 
@@ -28,15 +24,10 @@ export default function App() {
 
   return (
     <React.Fragment>
-      <TopNav color='light' onToggle={toggleMenu}/>
-      <Container fluid={showMenu}>
-        <Row>
-          {showMenu ? <Col md={3}><PositionMenu value={positions} onChange={changePositions} /></Col> : null}
-          <Col md={showMenu ? 9 : null}>
-            <PlayerTable positions={positions} sortBy={sortBy} onSort={changeSortBy} />
-          </Col>
-        </Row>
-      </Container>
+      <nav>
+        <h1>Hello world</h1>
+      </nav>
+      
     </React.Fragment>
   );
 };
