@@ -48,4 +48,14 @@ table {
   border-spacing: 0;
 }
 
+body.light {
+  background: #F0F2F2;
+  color: #151616;
+}
+
+body {
+  background: #1D1E1E;
+  color: #F0F2F2;
+}
+
 /*# sourceMappingURL=main.css.map */

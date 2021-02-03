@@ -1,0 +1,11 @@
+@use 'colors';
+
+$bg-high: colors.$grey-50;
+$bg-medium: colors.$grey-100;
+
+$text-high: colors.$grey-850;
+
+body.light {
+  background: $bg-medium;
+  color: $text-high; 
+}

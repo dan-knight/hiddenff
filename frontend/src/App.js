@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import { getPlayers } from './requests';
 
@@ -8,7 +8,6 @@ export default function App() {
   const [positions, setPositions] = useState(['RB']);
   const [sortBy, setSortBy] = useState('last');
   const [showMenu, setShowMenu] = useState(false);
-
 
   function toggleMenu() {
     setShowMenu(!showMenu);
@@ -27,7 +26,6 @@ export default function App() {
       <nav>
         <h1>Hello world</h1>
       </nav>
-      
     </React.Fragment>
   );
 };

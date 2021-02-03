@@ -1,1 +1,12 @@
 @use 'reset';
+@use 'colors';
+
+@use 'lighttheme';
+
+$bg-medium: colors.$grey-800;
+$text-high: colors.$grey-100;
+
+body {
+  background: $bg-medium;
+  color: $text-high;
+}
