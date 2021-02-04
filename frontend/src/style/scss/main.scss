@@ -1,12 +1,18 @@
 @use 'reset';
 @use 'colors';
+@use 'layout';
 
 @use 'lighttheme';
 
 $bg-medium: colors.$grey-800;
+$bg-dark: colors.$grey-900;
 $text-high: colors.$grey-100;
 
 body {
   background: $bg-medium;
   color: $text-high;
+}
+
+.sidebar, .sidebar-buffer {
+  background: $bg-dark;
 }

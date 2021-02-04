@@ -23,9 +23,12 @@ export default function App() {
 
   return (
     <React.Fragment>
-      <nav>
-        <h1>Hello world</h1>
-      </nav>
+      <div className="container">
+        <nav>nav</nav>
+        <main>main</main>
+        <div className="sidebar-buffer"></div>
+        <div className="sidebar">sidebar</div>
+      </div>
     </React.Fragment>
   );
 };
