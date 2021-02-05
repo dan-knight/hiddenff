@@ -1,11 +1,23 @@
 @use 'colors';
 
 $bg-high: colors.$grey-50;
-$bg-medium: colors.$grey-100;
+$bg-low: colors.$grey-100;
 
 $text-high: colors.$grey-850;
+$text-low: colors.$grey-300;
 
 body.light {
-  background: $bg-medium;
+  background: $bg-high;
   color: $text-high; 
+
+  nav {
+    > div {
+      border-bottom-color: $text-low;
+    }
+  }
+
+  .sidebar, .sidebar-buffer {
+    background: $bg-low;
+    border-right-color: $text-low;
+  }
 }

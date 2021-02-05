@@ -1,0 +1,9 @@
+@mixin borderStyle($side) {
+  $border-side: 'border';
+  @if $side {
+    $border-side: #{$border-side}-#{$side}
+  }
+
+  #{$border-side}-width: 0.075rem;
+  #{$border-side}-style: solid;
+}

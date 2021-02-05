@@ -2,24 +2,30 @@
 @use 'text';
 @use 'colors';
 @use 'layout';
+@use 'mixins';
 
 @use 'lighttheme';
 
-$bg-medium: colors.$grey-800;
-$bg-dark: colors.$grey-900;
+$bg-high: colors.$grey-800;
+$bg-medium: colors.$grey-850;
+$bg-low: colors.$grey-900;
+
 $text-high: colors.$grey-100;
+$text-low: colors.$grey-700;
+
+$bg: $bg-high;
 
 body {
-  background: $bg-medium;
+  background: $bg;
   color: $text-high;
   font-family: Proxima Nova, sans-serif;
 }
 
 nav {
   > div {
-    border-bottom-width: 0.075rem;
-    border-bottom-style: solid;
-    border-bottom-color: colors.$grey-700;
+    $border-side: 'bottom';
+    @include mixins.borderStyle($border-side);
+    border-#{$border-side}-color: $text-low;
   }
 
   h4 {
@@ -41,5 +47,11 @@ nav {
 }
 
 .sidebar, .sidebar-buffer {
-  background: $bg-dark;
+  $bg: $bg-low;
+
+  background: $bg;
+
+  $border-side: 'right';
+  @include mixins.borderStyle($border-side);
+  border-#{$border-side}-color: $text-low;
 }
