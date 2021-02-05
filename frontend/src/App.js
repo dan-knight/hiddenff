@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import TopNav from './components/TopNav';
 
 import { getPlayers } from './requests';
 
@@ -24,7 +25,7 @@ export default function App() {
   return (
     <React.Fragment>
       <div className="container">
-        <nav>nav</nav>
+        <TopNav />
         <main>main</main>
         <div className="sidebar-buffer"></div>
         <div className="sidebar">sidebar</div>

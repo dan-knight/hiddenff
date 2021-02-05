@@ -1,0 +1,17 @@
+@mixin calculateSizes($size) {
+  font-size: $size;
+  margin: ($size * 0.5) 0;
+  font-weight: 400;
+}
+
+h1 {
+  @include calculateSizes(1.953rem);
+}
+
+h2 {
+  @include calculateSizes(1.563rem);
+}
+
+h1, h2, h3, h4, h5, h6, a, li {
+  line-height: 1.5;
+}

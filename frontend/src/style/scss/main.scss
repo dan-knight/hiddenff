@@ -1,4 +1,5 @@
 @use 'reset';
+@use 'text';
 @use 'colors';
 @use 'layout';
 
@@ -11,6 +12,32 @@ $text-high: colors.$grey-100;
 body {
   background: $bg-medium;
   color: $text-high;
+  font-family: Proxima Nova, sans-serif;
+}
+
+nav {
+  > div {
+    border-bottom-width: 0.075rem;
+    border-bottom-style: solid;
+    border-bottom-color: colors.$grey-700;
+  }
+
+  h1 {
+    font-family: Nunito, sans-serif;
+
+    span {
+      font-weight: 300;
+    }
+  }
+
+  li {
+    margin: 0 1rem;
+    float: left;
+
+    &:first-child {
+      margin-left: 0;
+    }
+  }
 }
 
 .sidebar, .sidebar-buffer {

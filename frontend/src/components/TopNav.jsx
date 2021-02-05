@@ -1,25 +1,35 @@
 import React from 'react';
-import { Navbar } from 'react-bootstrap';
-import { Gear } from './Icons';
 
-export default function TopNav(props) {
-  function handleToggle(event) {
-    event.preventDefault();
-    props.onToggle();
-  };
-
+export default function TopNav() {
   return (
-    <Navbar fixed="top" 
-      variant={props.color} bg={props.color}>
-      <Navbar.Collapse className="collapse w-100 order-0">
-        <div onClick={handleToggle} className='iconButton'>
-          <Gear size='1.5' />
-        </div>
-      </Navbar.Collapse>
-        <Navbar.Brand href='/'>hiddenFF</Navbar.Brand>
-      <Navbar.Collapse className="collapse w-100 order-2">
-          
-      </Navbar.Collapse>
-    </Navbar> 
+    <nav>
+      <div>
+        <Links />
+        <Logo />
+        <Links style={{ visibility: 'hidden' }} />
+      </div>
+    </nav>
   );
+};
+
+const links = [
+  { url: '/players', label: 'Players' },
+  { url: '/teams', label: 'Teams' },
+  { url: '/settings', label: 'Settings' }
+];
+
+function Links(props) {
+  return (
+    <ul style={props.style}>
+      {links.map(l => (
+        <li>
+          <a href={l.url}>{l.label}</a>
+        </li>
+      ))}
+    </ul>
+  );
+};
+
+function Logo() {
+  return <h1 align="center"><span>hidden</span>FF</h1>;
 };
