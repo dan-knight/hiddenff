@@ -31,5 +31,5 @@ function Links(props) {
 };
 
 function Logo() {
-  return <h1 align="center"><span>hidden</span>FF</h1>;
+  return <h4 align="center"><span>hidden</span>FF</h4>;
 };

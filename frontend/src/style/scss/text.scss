@@ -1,17 +1,20 @@
-@mixin calculateSizes($size) {
-  font-size: $size;
-  margin: ($size * 0.5) 0;
-  font-weight: 400;
+@mixin typeScale($scale) {
+  $size: 1rem;
+
+  @for $h from 6 to 0 {
+    h#{$h} {
+      font-size: $size;
+      margin: ($size * 0.5) 0;
+      font-weight: 400;
+    }
+
+    $size: $size * $scale; 
+  }
 }
 
-h1 {
-  @include calculateSizes(1.953rem);
-}
-
-h2 {
-  @include calculateSizes(1.563rem);
-}
+@include typeScale(1.25);
 
 h1, h2, h3, h4, h5, h6, a, li {
   line-height: 1.5;
 }
+
