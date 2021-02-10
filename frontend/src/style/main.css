@@ -137,7 +137,7 @@ main {
 
 body.light {
   background: #FAFAFA;
-  color: #151616;
+  color: #0F1111;
 }
 body.light nav > div {
   border-bottom-color: #D2D6D6;
@@ -149,8 +149,8 @@ body.light .sidebar, body.light .sidebar-buffer {
 
 body {
   background: #1D1E1E;
-  color: #F0F2F2;
   font-family: Proxima Nova, sans-serif;
+  color: #FAFAFA;
 }
 
 nav > div {
@@ -160,6 +160,7 @@ nav > div {
 }
 nav h4 {
   font-family: Nunito, sans-serif;
+  opacity: 95%;
 }
 nav h4 span {
   font-weight: 300;
@@ -170,6 +171,13 @@ nav li {
 }
 nav li:first-child {
   margin-left: 0;
+}
+nav li a {
+  opacity: 60%;
+  transition: opacity 0.25s;
+}
+nav li a:hover {
+  opacity: 74%;
 }
 
 .sidebar, .sidebar-buffer {

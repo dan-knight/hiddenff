@@ -3,21 +3,21 @@
 $bg-high: colors.$grey-50;
 $bg-low: colors.$grey-100;
 
-$text-high: colors.$grey-850;
-$text-low: colors.$grey-300;
+$text-color: colors.$grey-900;
+$divider-color: colors.$grey-300;
 
 body.light {
   background: $bg-high;
-  color: $text-high; 
+  color: $text-color; 
 
   nav {
     > div {
-      border-bottom-color: $text-low;
+      border-bottom-color: $divider-color;
     }
   }
 
   .sidebar, .sidebar-buffer {
     background: $bg-low;
-    border-right-color: $text-low;
+    border-right-color: $divider-color;
   }
 }

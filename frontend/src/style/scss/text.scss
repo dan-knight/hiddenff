@@ -18,3 +18,36 @@ h1, h2, h3, h4, h5, h6, a, li {
   line-height: 1.5;
 }
 
+@mixin extraHighContrast() { opacity: 95%; }
+@mixin highContrast() { opacity: 87%; };
+@mixin mediumContrast() { opacity: 60%; };
+@mixin lowContrast() { opacity: 38%; };
+
+$hover-transition-length: 0.25s;
+
+@mixin hover($hover-opacity) {
+  transition: opacity $hover-transition-length;
+
+  &:hover {
+    opacity: $hover-opacity;
+  }
+}
+
+@mixin highContrastHover() {
+  @include highContrast();
+  @include hover(95%)
+}
+
+@mixin mediumContrastHover() {
+  @include mediumContrast();
+  @include hover(74%);
+}
+
+
+
+@mixin lowContrastHover() {
+  @include lowContrast();
+  @include hover(49%);
+}
+
+
