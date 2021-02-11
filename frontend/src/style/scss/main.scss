@@ -47,7 +47,41 @@ nav {
     }
 
     a {
-      @include text.mediumContrastHover();
+      @include text.mediumContrastWithHover();
+    }
+  }
+}
+
+main {
+  tr {
+    &:nth-child(even) {
+      background: $bg-medium;
+    }
+
+    transition: background-color 0.5s;
+  }
+
+  th {
+    text-align: left;
+    
+    div {
+      @include text.mediumContrast();
+      
+      &.sortable {
+        @include text.mediumContrastHover();
+        cursor: pointer;
+      }
+    }
+  }
+
+  th, td {
+    white-space: nowrap;
+    cursor: default;
+  }
+
+  tbody {
+    tr:hover {
+      background: rgba(colors.$primary-500, 0.10) !important;
     }
   }
 }

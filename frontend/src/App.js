@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import PlayerTable from './components/PlayerTable';
 import TopNav from './components/TopNav';
 
 import { getPlayers } from './requests';
@@ -26,7 +27,7 @@ export default function App() {
     <React.Fragment>
       <div className="container">
         <TopNav />
-        <main>main</main>
+        <PlayerTable positions={positions} sortBy={sortBy} onSort={changeSortBy} />
         <div className="sidebar-buffer"></div>
         <div className="sidebar">sidebar</div>
       </div>

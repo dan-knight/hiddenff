@@ -23,14 +23,39 @@ nav {
   }
 }
 
-main, .sidebar {
-  padding: $spacing;
-}
-
 main {
   grid-column: 2;
   grid-row: 2;
 
+  padding: $spacing 0;
+  overflow: hidden;
+
+  div.table {
+    overflow-y: scroll;
+    overflow-x: hidden;
+    height: 100%;
+  }
+
+  table {
+    width: 100%;
+  }
+
+  tr {
+    td, th {
+      padding: 1rem;
+    }
+
+    > :first-child {
+      padding-left: $spacing;
+    }
+
+    > :last-child {
+      padding-right: $spacing;
+    }
+  }
+}
+
+.sidebar {
   padding: $spacing;
 }
 

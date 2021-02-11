@@ -20,7 +20,8 @@ export default function PlayerTable(props) {
 
   async function getPlayerData(start=0) {
     const newData = await request({ 
-      url: 'http://localhost:3001/players',
+      // url: 'http://localhost:3001/players',
+      url: 'https://api.hiddenff.com/players',
       params: {
         columns: queryColumns,
         positions: JSON.stringify(props.positions),
@@ -41,8 +42,8 @@ export default function PlayerTable(props) {
   };
 
   return (
-    <div>
+    <main>
       <Table data={playerData} columns={allColumns} sortBy={props.sortBy} onSort={props.onSort} />
-    </div>
+    </main>
   ); 
 }

@@ -113,13 +113,31 @@ nav > div {
   align-items: center;
 }
 
-main, .sidebar {
-  padding: 2rem;
-}
-
 main {
   grid-column: 2;
   grid-row: 2;
+  padding: 2rem 0;
+  overflow: hidden;
+}
+main div.table {
+  overflow-y: scroll;
+  overflow-x: hidden;
+  height: 100%;
+}
+main table {
+  width: 100%;
+}
+main tr td, main tr th {
+  padding: 1rem;
+}
+main tr > :first-child {
+  padding-left: 2rem;
+}
+main tr > :last-child {
+  padding-right: 2rem;
+}
+
+.sidebar {
   padding: 2rem;
 }
 
@@ -141,6 +159,9 @@ body.light {
 }
 body.light nav > div {
   border-bottom-color: #D2D6D6;
+}
+body.light main tr:nth-child(even) {
+  background: #F0F2F2;
 }
 body.light .sidebar, body.light .sidebar-buffer {
   background: #F0F2F2;
@@ -178,6 +199,33 @@ nav li a {
 }
 nav li a:hover {
   opacity: 74%;
+}
+
+main tr {
+  transition: background-color 0.5s;
+}
+main tr:nth-child(even) {
+  background: #151616;
+}
+main th {
+  text-align: left;
+}
+main th div {
+  opacity: 60%;
+}
+main th div.sortable {
+  transition: opacity 0.25s;
+  cursor: pointer;
+}
+main th div.sortable:hover {
+  opacity: 74%;
+}
+main th, main td {
+  white-space: nowrap;
+  cursor: default;
+}
+main tbody tr:hover {
+  background: rgba(113, 226, 221, 0.1) !important;
 }
 
 .sidebar, .sidebar-buffer {

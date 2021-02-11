@@ -16,6 +16,14 @@ body.light {
     }
   }
 
+  main {
+    tr {
+      &:nth-child(even) {
+        background: $bg-low;
+      }
+    }
+  }
+
   .sidebar, .sidebar-buffer {
     background: $bg-low;
     border-right-color: $divider-color;

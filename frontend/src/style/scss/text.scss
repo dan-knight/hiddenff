@@ -34,20 +34,31 @@ $hover-transition-length: 0.25s;
 }
 
 @mixin highContrastHover() {
-  @include highContrast();
   @include hover(95%)
 }
 
 @mixin mediumContrastHover() {
-  @include mediumContrast();
   @include hover(74%);
 }
 
-
-
 @mixin lowContrastHover() {
-  @include lowContrast();
   @include hover(49%);
 }
 
+
+
+@mixin highContrastWithHover() {
+  @include highContrast();
+  @include highContrastHover();
+}
+
+@mixin mediumContrastWithHover() {
+  @include mediumContrast();
+  @include mediumContrastHover();
+}
+
+@mixin lowContrastWithHover() {
+  @include lowContrast();
+  @include lowContrastHover();
+}
 

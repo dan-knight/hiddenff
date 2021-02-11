@@ -1,24 +1,24 @@
 import React from 'react';
 
-import { Table as BootstrapTable } from 'react-bootstrap';
-import { capitalizeSentence } from '../utility';
 import { CaretUp } from './Icons';
 
 export default function Table(props) {
   return (
-    <BootstrapTable striped bordered hover>
-      <thead>
-        <tr>
-          {props.columns.map(col => (
-            <HeadCell label={col.label} colName={col.name}
-              sortValue={col.sortValue} sortBy={props.sortBy} sortable={col.sortable} 
-              onClick={props.onSort} key={col.name} />))}
-        </tr> 
-      </thead>
-      <tbody>
-        {props.data.map(d => <TableRow key={d.id} data={d} columns={props.columns} />)}
-      </tbody>
-    </BootstrapTable>
+    <div className="table">
+      <table>
+        <thead>
+          <tr>
+            {props.columns.map(col => (
+              <HeadCell label={col.label} colName={col.name}
+                sortValue={col.sortValue} sortBy={props.sortBy} sortable={col.sortable} 
+                onClick={props.onSort} key={col.name} />))}
+          </tr> 
+        </thead>
+        <tbody>
+          {props.data.map(d => <TableRow key={d.id} data={d} columns={props.columns} />)}
+        </tbody>
+      </table>
+    </div>
   );
 };
 
@@ -41,7 +41,7 @@ function HeadCell(props) {
 function TableRow(props) {
   return (
     <tr>
-      {props.columns.map(col => <td key={col.name}>{col.func ? col.func(props.data) : props.data[col.name]}</td>)}
+      {props.columns.map(col => <td key={col.name}>{col.func ? col.func(props.data) : Number(props.data[col.name]).toFixed(1)}</td>)}
     </tr>
   );
 };
