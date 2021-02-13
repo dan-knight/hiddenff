@@ -4,7 +4,7 @@ import { CaretUp } from './Icons';
 
 export default function Table(props) {
   return (
-    <div className="table">
+    <div className="data">
       <table>
         <thead>
           <tr>

@@ -53,6 +53,13 @@ nav {
 }
 
 main {
+  .toggle {
+    @include text.highContrastWithHover();
+    font-weight: 300;
+    
+    cursor: pointer;
+  }
+
   tr {
     &:nth-child(even) {
       background: $bg-medium;
@@ -94,4 +101,56 @@ main {
   $border-side: 'right';
   @include mixins.borderStyle($border-side);
   border-#{$border-side}-color: $divider-color;
+}
+
+.searchbar {
+  background: $bg-low;
+  @include mixins.borderStyle();
+  border-color: $divider-color;
+
+  input {
+    color: $text-color;
+    @include text.mediumContrast();
+    font-weight: 300;
+    font-size: 0.8rem;
+
+    background: none;
+    border: none;
+    @include mixins.noFocus();
+  }
+}
+
+.button-group {
+  label {
+    @include text.mediumContrast();
+    font-size: 0.875rem;
+  }
+}
+
+button {
+  $transition-length: text.$hover-transition-length;
+  background: $bg-low;
+
+  @include mixins.borderStyle();
+  border-color: $divider-color;
+  @include mixins.noFocus();
+
+  cursor: pointer;
+
+  span {
+    color: $text-color;
+    font-size: 0.85rem;
+    @include text.mediumContrast();
+    transition: opacity $transition-length;
+  }
+
+  transition: border-color $transition-length;
+
+  &:hover {
+    border-color: 'border-color', colors.$grey-600;
+    
+    span {
+      opacity: map-get(text.$hover-opacity, 'medium');
+    }
+  }
 }

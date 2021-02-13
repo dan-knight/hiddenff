@@ -1,4 +1,4 @@
-@mixin borderStyle($side) {
+@mixin borderStyle($side: false) {
   $border-side: 'border';
   @if $side {
     $border-side: #{$border-side}-#{$side}
@@ -6,4 +6,10 @@
 
   #{$border-side}-width: 0.075rem;
   #{$border-side}-style: solid;
+}
+
+@mixin noFocus() {
+  &:focus {
+    outline: none;
+  }
 }

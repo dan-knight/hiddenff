@@ -28,4 +28,13 @@ body.light {
     background: $bg-low;
     border-right-color: $divider-color;
   }
+
+  .searchbar {
+    background: $bg-low;
+    border-color: $divider-color;
+  }
+
+  input {
+    color: $text-color;
+  }
 }

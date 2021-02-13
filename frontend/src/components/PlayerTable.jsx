@@ -6,6 +6,7 @@ import useDataStorage from '../hooks/useDataStorage';
 import Table from './Table';
 
 import useColumns from '../hooks/useColumns';
+import PlayerOverviewOptions from './PlayerOverviewOptions';
 
 export default function PlayerTable(props) {
   const [loading, error, request] = useAxios();
@@ -43,7 +44,8 @@ export default function PlayerTable(props) {
 
   return (
     <main>
-      <Table data={playerData} columns={allColumns} sortBy={props.sortBy} onSort={props.onSort} />
+      <PlayerOverviewOptions />
+      <Table data={playerData} columns={allColumns} sortBy={props.sortBy} loading={loading} onSort={props.onSort} />
     </main>
   ); 
 }

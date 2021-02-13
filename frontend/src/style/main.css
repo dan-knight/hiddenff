@@ -93,6 +93,10 @@ h1, h2, h3, h4, h5, h6, a, li {
   line-height: 1.5;
 }
 
+input, button {
+  font-family: inherit;
+}
+
 .container {
   display: grid;
   grid-template-columns: 1fr 4fr;
@@ -116,10 +120,21 @@ nav > div {
 main {
   grid-column: 2;
   grid-row: 2;
-  padding: 2rem 0;
   overflow: hidden;
 }
-main div.table {
+main .options {
+  padding: 1rem 0;
+}
+main .options .top {
+  padding: 1rem 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+main .options .content {
+  padding: 1rem 0;
+}
+main .data {
   overflow-y: scroll;
   overflow-x: hidden;
   height: 100%;
@@ -134,6 +149,10 @@ main tr > :first-child {
   padding-left: 2rem;
 }
 main tr > :last-child {
+  padding-right: 2rem;
+}
+main .options, main footer {
+  padding-left: 2rem;
   padding-right: 2rem;
 }
 
@@ -153,6 +172,28 @@ main tr > :last-child {
   grid-row: 1;
 }
 
+.searchbar {
+  width: 12rem;
+  border-radius: 2rem;
+  padding: 0.25rem 0.75rem;
+}
+
+.button-group {
+  display: inline-block;
+  margin-right: 3rem;
+}
+.button-group label {
+  display: block;
+  margin-bottom: 1rem;
+}
+
+button {
+  border-radius: 2rem;
+  padding: 0.5rem 1rem;
+  margin-left: -0.33rem;
+  margin-right: 0.83rem;
+}
+
 body.light {
   background: #FAFAFA;
   color: #0F1111;
@@ -166,6 +207,13 @@ body.light main tr:nth-child(even) {
 body.light .sidebar, body.light .sidebar-buffer {
   background: #F0F2F2;
   border-right-color: #D2D6D6;
+}
+body.light .searchbar {
+  background: #F0F2F2;
+  border-color: #D2D6D6;
+}
+body.light input {
+  color: #0F1111;
 }
 
 body {
@@ -198,9 +246,18 @@ nav li a {
   transition: opacity 0.25s;
 }
 nav li a:hover {
-  opacity: 74%;
+  opacity: 73.5%;
 }
 
+main .toggle {
+  opacity: 95%;
+  transition: opacity 0.25s;
+  font-weight: 300;
+  cursor: pointer;
+}
+main .toggle:hover {
+  opacity: 100%;
+}
 main tr {
   transition: background-color 0.5s;
 }
@@ -218,7 +275,7 @@ main th div.sortable {
   cursor: pointer;
 }
 main th div.sortable:hover {
-  opacity: 74%;
+  opacity: 73.5%;
 }
 main th, main td {
   white-space: nowrap;
@@ -233,6 +290,53 @@ main tbody tr:hover {
   border-right-width: 0.075rem;
   border-right-style: solid;
   border-right-color: #363D3D;
+}
+
+.searchbar {
+  background: #0F1111;
+  border-width: 0.075rem;
+  border-style: solid;
+  border-color: #363D3D;
+}
+.searchbar input {
+  color: #FAFAFA;
+  opacity: 60%;
+  font-weight: 300;
+  font-size: 0.8rem;
+  background: none;
+  border: none;
+}
+.searchbar input:focus {
+  outline: none;
+}
+
+.button-group label {
+  opacity: 60%;
+  font-size: 0.875rem;
+}
+
+button {
+  background: #0F1111;
+  border-width: 0.075rem;
+  border-style: solid;
+  border-color: #363D3D;
+  cursor: pointer;
+  transition: border-color 0.25s;
+}
+button:focus {
+  outline: none;
+}
+button span {
+  color: #FAFAFA;
+  font-size: 0.85rem;
+  opacity: 60%;
+  transition: opacity 0.25s;
+}
+button:hover {
+  border-color: "border-color", #5E6868;
+}
+button:hover span {
+  opacity: 73.5%;
 }
 
 /*# sourceMappingURL=main.css.map */
