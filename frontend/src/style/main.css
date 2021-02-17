@@ -169,6 +169,9 @@ main .options, main footer {
 .sidebar > div {
   margin-bottom: 1rem;
 }
+.sidebar .divider {
+  padding-top: 1rem;
+}
 
 .sidebar-buffer {
   grid-row: 1;
@@ -196,9 +199,6 @@ button {
   margin-right: 0.83rem;
 }
 
-.radio-group {
-  padding-bottom: 1rem;
-}
 .radio-group label {
   display: flex;
   align-items: center;
@@ -314,14 +314,6 @@ main tbody tr:hover {
   border-right-style: solid;
   border-right-color: #363D3D;
 }
-.sidebar .radio-group, .sidebar-buffer .radio-group {
-  border-bottom-width: 0.075rem;
-  border-bottom-style: solid;
-  border-color: #363D3D;
-}
-.sidebar > :last-child .radio-group, .sidebar-buffer > :last-child .radio-group {
-  border-bottom: none;
-}
 
 .searchbar {
   background: #0F1111;
@@ -397,6 +389,13 @@ button:hover span {
 }
 .radio-group div.checked {
   background-color: #C2F2EC;
+}
+
+.divider {
+  border-bottom-width: 0.075rem;
+  border-bottom-style: solid;
+  border-color: #363D3D;
+  height: 0px;
 }
 
 /*# sourceMappingURL=main.css.map */

@@ -101,17 +101,6 @@ main {
   $border-side: 'right';
   @include mixins.borderStyle($border-side);
   border-#{$border-side}-color: $divider-color;
-
-  .radio-group {
-    @include mixins.borderStyle('bottom');
-    border-color: $divider-color;
-  }
-
-  > :last-child {
-    .radio-group {
-      border-bottom: none;
-    }
-  }
 }
 
 .searchbar {
@@ -184,10 +173,6 @@ button {
       transition: opacity text.$hover-transition-length;
     }
 
-    // &:first-child {
-    //   margin-top: 0;
-    // }
-
     &:hover {
       cursor: pointer;
 
@@ -208,4 +193,11 @@ button {
       background-color: colors.$primary-300;
     }
   }
+}
+
+.divider {
+  @include mixins.borderStyle('bottom');
+  border-color: $divider-color;
+
+  height: 0px;
 }

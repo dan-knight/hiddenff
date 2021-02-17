@@ -88,6 +88,10 @@ main {
   > div {
     margin-bottom: $inner-spacing;
   }
+
+  .divider {
+    padding-top: $inner-spacing;
+  }
 }
 
 .sidebar-buffer {
@@ -124,8 +128,6 @@ button {
 }
 
 .radio-group {
-  padding-bottom: $inner-spacing;
-
   label {
     display: flex;
     align-items: center;

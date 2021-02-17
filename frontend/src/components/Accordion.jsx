@@ -1,8 +1,10 @@
 import React from 'react';
+import $ from 'jquery';
+import Divider from './Divider';
 
 export default function Accordion({ label, collapseID, ...props }) {
   function handleToggle() {
-    alert('click');
+    $(`#${collapseID}`).slideToggle();
   };
 
   return (
@@ -13,6 +15,7 @@ export default function Accordion({ label, collapseID, ...props }) {
       <div className="content" id={collapseID}>
         {props.children}
       </div>
+      <Divider />
     </div>
   );
 };
