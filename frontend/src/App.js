@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import PlayerTable from './components/PlayerTable';
+import Sidebar from './components/Sidebar';
 import TopNav from './components/TopNav';
 
 import { getPlayers } from './requests';
@@ -28,8 +29,7 @@ export default function App() {
       <div className="container">
         <TopNav />
         <PlayerTable positions={positions} sortBy={sortBy} onSort={changeSortBy} />
-        <div className="sidebar-buffer"></div>
-        <div className="sidebar">sidebar</div>
+        <Sidebar />
       </div>
     </React.Fragment>
   );

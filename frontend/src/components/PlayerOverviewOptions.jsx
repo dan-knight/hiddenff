@@ -6,9 +6,9 @@ export default function PlayerOverviewOptions(props) {
   return (
     <div className="options">
       <div className="top">
-        <span className="toggle">
-          View Options
-        </span>
+        <div className="toggle" style={{display: 'inline-block'}}>
+          <span>View Options</span>
+        </div>
         <Searchbar placeholder="Search Players" />
       </div>
       <div className="content" id="options-content">

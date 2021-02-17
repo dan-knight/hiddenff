@@ -41,7 +41,7 @@ function HeadCell(props) {
 function TableRow(props) {
   return (
     <tr>
-      {props.columns.map(col => <td key={col.name}>{col.func ? col.func(props.data) : Number(props.data[col.name]).toFixed(1)}</td>)}
+      {props.columns.map(col => <td key={col.name}>{col.func ? col.func(props.data) : props.data[col.name]}</td>)}
     </tr>
   );
 };

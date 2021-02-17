@@ -1,4 +1,4 @@
-@mixin typeScale($scale) {
+@mixin headerSizes($scale) {
   $size: 1rem;
 
   @for $h from 6 to 0 {
@@ -12,7 +12,7 @@
   }
 }
 
-@include typeScale(1.25);
+@include headerSizes(1.25);
 
 h1, h2, h3, h4, h5, h6, a, li {
   line-height: 1.5;

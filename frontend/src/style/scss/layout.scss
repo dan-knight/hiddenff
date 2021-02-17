@@ -1,4 +1,5 @@
-$spacing: 2rem;
+$outer-spacing: 2rem;
+$inner-spacing: $outer-spacing * 0.5;
 
 .container {
   display: grid;
@@ -14,7 +15,7 @@ $spacing: 2rem;
 nav {
   grid-row: 1;
   grid-column: 2;
-  padding: 0 $spacing;
+  padding: 0 $outer-spacing;
 
   > div {
     display: flex;
@@ -29,18 +30,16 @@ main {
   overflow: hidden;
 
   .options {
-    $options-spacing: $spacing * 0.5;
-    padding: $options-spacing 0;
+    margin-bottom: $inner-spacing;
 
     .top {
-      padding: ($spacing * 0.5) 0;
       display: flex;
       justify-content: space-between;
       align-items: center;
     }
 
     .content {
-      padding: $options-spacing 0;
+      padding: $inner-spacing 0;
     }
   }
 
@@ -60,23 +59,23 @@ main {
     }
 
     > :first-child {
-      padding-left: $spacing;
+      padding-left: $outer-spacing;
     }
 
     > :last-child {
-      padding-right: $spacing;
+      padding-right: $outer-spacing;
     }
   }
 
   .options, footer {
-    padding-left: $spacing;
-    padding-right: $spacing;
+    padding-left: $outer-spacing;
+    padding-right: $outer-spacing;
   }
 
 }
 
 .sidebar {
-  padding: $spacing;
+  padding: 0 $outer-spacing;
 }
 
 .sidebar, .sidebar-buffer {
@@ -85,6 +84,10 @@ main {
 
 .sidebar {
   grid-row: 2;
+
+  > div {
+    margin-bottom: $inner-spacing;
+  }
 }
 
 .sidebar-buffer {
@@ -103,7 +106,7 @@ main {
 
   label {
     display: block;
-    margin-bottom: $spacing * 0.5;
+    margin-bottom: $outer-spacing * 0.25;
   }
 }
 
@@ -118,4 +121,31 @@ button {
 
   margin-left: $negative-margin;
   margin-right: 0.5rem + ($negative-margin * -1);
+}
+
+.radio-group {
+  padding-bottom: $inner-spacing;
+
+  label {
+    display: flex;
+    align-items: center;
+
+    margin: $inner-spacing 0;
+    
+    div {
+      display: inline-block;
+
+      margin: 0;
+      margin-bottom: 0.125rem;
+      margin-right: 0.75rem;
+
+      $size: 0.8rem;
+      height: $size;
+      width: $size;
+    }
+  }
+}
+
+.toggle {
+  padding: $inner-spacing 0;
 }
