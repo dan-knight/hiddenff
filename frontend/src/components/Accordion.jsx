@@ -8,9 +8,10 @@ export default function Accordion({ label, collapseID, ...props }) {
   };
 
   return (
-    <div>
+    <div className={props.cssClass ?? ''}>
       <div className='top'>
         <Toggle label={label} onToggle={handleToggle} />
+        {props.topExtras}
       </div>
       <div className="content" id={collapseID}>
         {props.children}

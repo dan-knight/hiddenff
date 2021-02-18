@@ -1,20 +1,15 @@
 import React from 'react';
+import Accordion from './Accordion';
 import ButtonGroup from './ButtonGroup';
 import Searchbar from './Searchbar';
 
-export default function PlayerOverviewOptions(props) {
+export default function PlayerOverviewOptions() {
   return (
-    <div className="options">
-      <div className="top">
-        <div className="toggle" style={{display: 'inline-block'}}>
-          <span>View Options</span>
-        </div>
-        <Searchbar placeholder="Search Players" />
-      </div>
-      <div className="content" id="options-content">
-        {buttonData.map(b => <ButtonGroup label={b.label} buttons={b.buttons} />)}
-      </div>
-    </div>
+    <Accordion label="View Options" collapseID="options" 
+      cssClass="options" topExtras={<Searchbar placeholder="Search Players" />}
+      >
+      {buttonData.map(b => <ButtonGroup label={b.label} buttons={b.buttons} />)}
+    </Accordion>
   );
 };
 

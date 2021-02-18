@@ -30,16 +30,24 @@ main {
   overflow: hidden;
 
   .options {
-    margin-bottom: $inner-spacing;
+    padding-bottom: $inner-spacing;
 
     .top {
       display: flex;
       justify-content: space-between;
       align-items: center;
+
+      > * {
+        display: inline-block;
+      }
     }
 
     .content {
-      padding: $inner-spacing 0;
+      padding-bottom: $inner-spacing;
+
+      > .button-group {
+        margin-top: $inner-spacing;
+      }
     }
   }
 
@@ -120,11 +128,7 @@ button {
   $horizontal-spacing: $vertical-spacing * 2;
 
   padding: $vertical-spacing $horizontal-spacing;
-
-  $negative-margin: $horizontal-spacing * -0.33;
-
-  margin-left: $negative-margin;
-  margin-right: 0.5rem + ($negative-margin * -1);
+  margin-right: 0.5rem;
 }
 
 .radio-group {

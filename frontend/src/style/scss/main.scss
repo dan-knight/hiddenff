@@ -58,6 +58,9 @@ main {
     font-weight: 300;
     
     cursor: pointer;
+    h5 {
+      font-size: 1rem;
+    }
   }
 
   tr {
@@ -132,7 +135,7 @@ button {
   background: $bg-low;
 
   @include mixins.borderStyle();
-  border-color: $divider-color;
+  border-color: colors.$grey-500;
   @include mixins.noFocus();
 
   cursor: pointer;
@@ -147,7 +150,7 @@ button {
   transition: border-color $transition-length;
 
   &:hover {
-    border-color: 'border-color', colors.$grey-600;
+    border-color: colors.$grey-400;
     
     span {
       opacity: map-get(text.$hover-opacity, 'medium');

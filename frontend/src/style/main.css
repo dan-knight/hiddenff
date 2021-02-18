@@ -123,15 +123,21 @@ main {
   overflow: hidden;
 }
 main .options {
-  margin-bottom: 1rem;
+  padding-bottom: 1rem;
 }
 main .options .top {
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
+main .options .top > * {
+  display: inline-block;
+}
 main .options .content {
-  padding: 1rem 0;
+  padding-bottom: 1rem;
+}
+main .options .content > .button-group {
+  margin-top: 1rem;
 }
 main .data {
   overflow-y: scroll;
@@ -195,8 +201,7 @@ main .options, main footer {
 button {
   border-radius: 2rem;
   padding: 0.5rem 1rem;
-  margin-left: -0.33rem;
-  margin-right: 0.83rem;
+  margin-right: 0.5rem;
 }
 
 .radio-group label {
@@ -246,7 +251,7 @@ body {
 }
 
 nav > div {
-  border-bottom-width: 0.075rem;
+  border-bottom-width: 0.1rem;
   border-bottom-style: solid;
   border-bottom-color: #363D3D;
 }
@@ -281,6 +286,9 @@ main .toggle {
 main .toggle:hover {
   opacity: 100%;
 }
+main .toggle h5 {
+  font-size: 1rem;
+}
 main tr {
   transition: background-color 0.5s;
 }
@@ -310,14 +318,14 @@ main tbody tr:hover {
 
 .sidebar, .sidebar-buffer {
   background: #0F1111;
-  border-right-width: 0.075rem;
+  border-right-width: 0.1rem;
   border-right-style: solid;
   border-right-color: #363D3D;
 }
 
 .searchbar {
   background: #0F1111;
-  border-width: 0.075rem;
+  border-width: 0.1rem;
   border-style: solid;
   border-color: #363D3D;
 }
@@ -340,9 +348,9 @@ main tbody tr:hover {
 
 button {
   background: #0F1111;
-  border-width: 0.075rem;
+  border-width: 0.1rem;
   border-style: solid;
-  border-color: #363D3D;
+  border-color: #747C7C;
   cursor: pointer;
   transition: border-color 0.25s;
 }
@@ -356,7 +364,7 @@ button span {
   transition: opacity 0.25s;
 }
 button:hover {
-  border-color: "border-color", #5E6868;
+  border-color: #B5BCBC;
 }
 button:hover span {
   opacity: 73.5%;
@@ -392,7 +400,7 @@ button:hover span {
 }
 
 .divider {
-  border-bottom-width: 0.075rem;
+  border-bottom-width: 0.1rem;
   border-bottom-style: solid;
   border-color: #363D3D;
   height: 0px;
