@@ -8,7 +8,7 @@ export default function Sidebar(props) {
       <div className="sidebar-buffer"></div>
       <div className="sidebar">
         {menus.map(m => (
-          <Accordion label={m.label} collapseID={m.id}>
+          <Accordion label={m.label}>
             <RadioGroup options={m.options} />
           </Accordion>))}
       </div>

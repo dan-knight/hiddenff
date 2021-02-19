@@ -37,4 +37,22 @@ body.light {
   input {
     color: $text-color;
   }
+
+  button {
+    background: $bg-low;
+    border-color: colors.$grey-500;
+
+    span {
+      color: $text-color;
+    }
+
+    &:hover {
+      border-color: colors.$grey-600;
+    }
+  }
+
+  .divider {
+    border-color: $divider-color;
+  }
 }
+

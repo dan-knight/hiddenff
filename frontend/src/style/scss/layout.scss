@@ -41,14 +41,6 @@ main {
         display: inline-block;
       }
     }
-
-    .content {
-      padding-bottom: $inner-spacing;
-
-      > .button-group {
-        margin-top: $inner-spacing;
-      }
-    }
   }
 
   .data {
@@ -125,7 +117,7 @@ main {
 button {
   border-radius: 2rem;
   $vertical-spacing: 0.5rem;
-  $horizontal-spacing: $vertical-spacing * 2;
+  $horizontal-spacing: $vertical-spacing * 2.25;
 
   padding: $vertical-spacing $horizontal-spacing;
   margin-right: 0.5rem;
@@ -148,6 +140,33 @@ button {
       $size: 0.8rem;
       height: $size;
       width: $size;
+    }
+  }
+}
+
+.accordion {
+  .content {
+    overflow-y: hidden;
+
+    padding: 0;
+    margin: 0;
+
+    transition: height 1s;
+    
+    .wrapper {
+      padding-bottom: $inner-spacing;
+
+      > .button-group {
+        margin-top: $inner-spacing;
+      }
+    }
+
+    .wrapper {
+      overflow: auto;
+    }
+
+    &.closed {
+      height: 0;
     }
   }
 }

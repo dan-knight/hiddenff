@@ -133,12 +133,6 @@ main .options .top {
 main .options .top > * {
   display: inline-block;
 }
-main .options .content {
-  padding-bottom: 1rem;
-}
-main .options .content > .button-group {
-  margin-top: 1rem;
-}
 main .data {
   overflow-y: scroll;
   overflow-x: hidden;
@@ -200,7 +194,7 @@ main .options, main footer {
 
 button {
   border-radius: 2rem;
-  padding: 0.5rem 1rem;
+  padding: 0.5rem 1.125rem;
   margin-right: 0.5rem;
 }
 
@@ -216,6 +210,25 @@ button {
   margin-right: 0.75rem;
   height: 0.8rem;
   width: 0.8rem;
+}
+
+.accordion .content {
+  overflow-y: hidden;
+  padding: 0;
+  margin: 0;
+  transition: height 1s;
+}
+.accordion .content .wrapper {
+  padding-bottom: 1rem;
+}
+.accordion .content .wrapper > .button-group {
+  margin-top: 1rem;
+}
+.accordion .content .wrapper {
+  overflow: auto;
+}
+.accordion .content.closed {
+  height: 0;
 }
 
 .toggle {
@@ -242,6 +255,19 @@ body.light .searchbar {
 }
 body.light input {
   color: #0F1111;
+}
+body.light button {
+  background: #F0F2F2;
+  border-color: #747C7C;
+}
+body.light button span {
+  color: #0F1111;
+}
+body.light button:hover {
+  border-color: #5E6868;
+}
+body.light .divider {
+  border-color: #D2D6D6;
 }
 
 body {

@@ -5,9 +5,8 @@ import Searchbar from './Searchbar';
 
 export default function PlayerOverviewOptions() {
   return (
-    <Accordion label="View Options" collapseID="options" 
-      cssClass="options" topExtras={<Searchbar placeholder="Search Players" />}
-      >
+    <Accordion label="View Options" cssClass="options" 
+      topExtras={<Searchbar placeholder="Search Players" />}>
       {buttonData.map(b => <ButtonGroup label={b.label} buttons={b.buttons} />)}
     </Accordion>
   );
