@@ -1,20 +1,23 @@
-import React, { useState } from 'react';
+import React from 'react';
 
-export default function RadioGroup({ options }) {
-  const [selected, setSelected] = useState(options.map(o => o.value));
+import { isSelected } from '../utility';
 
-  function handleChange(name) {
-    setSelected(selected.includes(name) ? selected.filter(o => o !== name) : [ ...selected, name ]);
-  }
-
+export default function RadioGroup({ options, selection, single, onChange }) {
   return (
     <div className="radio-group">
       {options.map(o => (
-        <label name={o.value} onClick={() => handleChange(o.value)}>
-          <div className={selected.includes(o.value) ? 'checked' : ''} />
-          <span>{o.label}</span>
-        </label>
+        <Radio value={o.value} label={o.label} 
+        selected={isSelected(o.value, selection, single)} onChange={onChange} />
       ))}
     </div>
   );
+};
+
+function Radio({ label, value, selected, onChange }) {
+  return (
+    <label onClick={() => onChange(value)}>
+      <div className={selected ? 'checked' : ''} />
+      <span>{label}</span>
+    </label>
+  )
 }

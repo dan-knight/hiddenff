@@ -1,25 +1,23 @@
-import React, { useState } from 'react';
+import React from 'react';
 
-export default function ButtonGroup(props) {
-  const [value, setValue] = useState(props.default);
+import { isSelected } from '../utility';
 
-  function handleChange(e) {
-    e.preventDefault();
-    setValue(e.target.value);
-  }
-
+export default function ButtonGroup({ label, options, selection, single, onChange }) {
   return (
     <div className='button-group'>
-      <label>{props.label}</label>
-      {props.buttons.map(b => <Button label={b.label} className={value === b.value ? 'active' : ''} />)}
+      <label>{label}</label>
+      {options.map(b => (
+        <Button value={b.value} label={b.label} 
+        isSelected={isSelected(b.value, selection, single)} onToggle={onChange} />
+      ))}
     </div>
   );
 };
 
-function Button(props) {
+function Button({ label, value, isSelected, onToggle }) {
   return (
-    <button>
-      <span>{props.label}</span>
+    <button name={value} className={isSelected ? 'selected' : ''} onClick={() => { onToggle(value); }}>
+      <span>{label}</span>
     </button>
   );
 }

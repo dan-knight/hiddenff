@@ -378,7 +378,7 @@ button {
   border-style: solid;
   border-color: #747C7C;
   cursor: pointer;
-  transition: border-color 0.25s;
+  transition: border-color 0.25s, background-color 0.25s;
 }
 button:focus {
   outline: none;
@@ -394,6 +394,20 @@ button:hover {
 }
 button:hover span {
   opacity: 73.5%;
+}
+button.selected {
+  background: #363D3D;
+  border-color: #C2F2EC;
+}
+button.selected span {
+  opacity: 95%;
+  transition: opacity 0.25s;
+}
+button.selected span:hover {
+  opacity: 100%;
+}
+button.selected:hover {
+  border-color: #E8F7F4;
 }
 
 .toggle {

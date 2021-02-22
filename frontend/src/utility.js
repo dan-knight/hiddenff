@@ -7,3 +7,7 @@ export function capitalizeSentence(sentence) {
 export function combineArrays(...arrays) {
   return [].concat(...arrays);
 };
+
+export const isSelected = (value, selection, single) => {
+  return single ? value === selection : selection.includes(value)
+};

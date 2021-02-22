@@ -147,13 +147,26 @@ button {
     transition: opacity $transition-length;
   }
 
-  transition: border-color $transition-length;
+  transition: border-color $transition-length, background-color $transition-length;
 
   &:hover {
     border-color: colors.$grey-400;
     
     span {
       opacity: map-get(text.$hover-opacity, 'medium');
+    }
+  }
+
+  &.selected {
+    background: colors.$grey-700;
+    border-color: colors.$primary-300;
+
+    span {
+      @include text.highContrastWithHover();
+    }
+
+    &:hover {
+      border-color: colors.$primary-100;
     }
   }
 }
