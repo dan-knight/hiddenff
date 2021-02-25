@@ -1,36 +1,15 @@
-import React, { useEffect, useState } from 'react';
-import PlayerTable from './components/PlayerTable';
-import Sidebar from './components/Sidebar';
-import TopNav from './components/TopNav';
+import React from 'react';
 
-import { getPlayers } from './requests';
+import TopNav from './components/TopNav';
+import PlayerOverview from './components/PlayerOverview';
 
 import './style/main.css';
 
 export default function App() {
-  const [positions, setPositions] = useState(['RB']);
-  const [sortBy, setSortBy] = useState('last');
-  const [showMenu, setShowMenu] = useState(false);
-
-  function toggleMenu() {
-    setShowMenu(!showMenu);
-  };
-
-  function changePositions(value) {
-    setPositions(value);
-  };
-
-  function changeSortBy(value) {
-    setSortBy(value);
-  };
-
   return (
-    <React.Fragment>
-      <div className="container">
-        <TopNav />
-        <PlayerTable positions={positions} sortBy={sortBy} onSort={changeSortBy} />
-        <Sidebar />
-      </div>
-    </React.Fragment>
+    <div className="container">
+      <TopNav />
+      <PlayerOverview />
+    </div>
   );
 };

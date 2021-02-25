@@ -3,40 +3,21 @@ import useOptions from '../hooks/useOptions';
 import Accordion from './Accordion';
 import RadioGroup from './RadioGroup';
 
-export default function Sidebar() {
-  const optionsData = useMemo(() => (
-    [
-      { label: 'Positions', id: 'positions',
-        default: ['QB', 'RB', 'WR', 'TE'],
-        buttons: [
-          { label: 'Quarterbacks', value: 'QB' },
-          { label: 'Running Backs', value: 'RB' },
-          { label: 'Wide Receivers', value: 'WR' },
-          { label: 'Tight Ends', value: 'TE' }
-      ]},
-    
-      { label: 'Games', id: 'slate', 
-        default: 'main',
-        buttons: [
-          { label: 'Full Slate', value: 'full' },
-          { label: 'Main Slate Only', value: 'main' },
-          { label: 'Primetime Slate', value: 'prime' }
-      ],
-      single: true
-    }]
-  ), []);
-
-  const [optionsState, updateOptionsState] = useOptions(optionsData);
+export default function Sidebar({ options={}, optionSelections, onChange }) {
+  
 
   return (
     <React.Fragment>
       <div className="sidebar-buffer"></div>
       <div className="sidebar">
-        {optionsData.map(m => (
-          <Accordion label={m.label}>
-            <RadioGroup selection={optionsState[m.id]} options={m.buttons} 
-            onChange={value => { updateOptionsState(value, m.id); }} />
-          </Accordion>))}
+        {Object.keys(options).map(k => {
+          const option = options[k];
+          return (
+            <Accordion label={option.label}>
+              <RadioGroup selection={optionSelections[k]} options={option.buttons} 
+              onChange={value => { onChange(value, k); }} />
+            </Accordion>
+          )})}
       </div>
     </React.Fragment>
   );

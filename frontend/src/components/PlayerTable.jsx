@@ -44,7 +44,6 @@ export default function PlayerTable(props) {
 
   return (
     <main>
-      <PlayerOverviewOptions />
       <Table data={playerData} columns={allColumns} sortBy={props.sortBy} loading={loading} onSort={props.onSort} />
     </main>
   ); 
