@@ -1,11 +1,11 @@
 import React, { useMemo } from 'react';
 
-import View from './View';
-import Sidebar from './Sidebar';
-import PlayerTable from './PlayerTable';
+import View from '../View';
+import Sidebar from '../Sidebar';
+import PlayerTable from '../PlayerTable';
 
-import useOptions from '../hooks/useOptions';
-import MainOptions from './MainOptions';
+import useOptions from '../../hooks/useOptions';
+import MainOptions from '../MainOptions';
 
 export default function PlayerOverview() {
   const optionsData = useMemo(() => ({
@@ -51,13 +51,13 @@ export default function PlayerOverview() {
         default: 'total',
         buttons: [
           {label: 'Season Total', value: 'total'},
-          {label: 'Per Game', value: 'per_game'},
-          {label: 'Per Attempt', value: 'per_att'}
+          // {label: 'Per Game', value: 'per_game'},
+          {label: 'Per Attempt', value: 'perAtt'}
         ], 
         single: true
       },
       'srt': {
-        default: 'last',
+        default: 'name',
         single: true
       }
     }), []);
@@ -73,7 +73,7 @@ export default function PlayerOverview() {
         <MainOptions options={mainOptions} optionsState={optionsState} 
           searchbarPlaceholder="Search Players"
           onChange={updateOptionsState} />
-        <PlayerTable positions={optionsState.pos} sortBy={optionsState.srt} onSort={value => { updateOptionsState(value, 'srt'); }} />
+        <PlayerTable optionsState={optionsState} onSort={value => { updateOptionsState(value, 'srt'); }} />
       </View>
   );
 };

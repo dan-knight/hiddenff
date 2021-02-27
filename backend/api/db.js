@@ -1,9 +1,12 @@
+const utility = require ('./utility');
+
+const knex = require('knex');
 const knexUtils = require('knex-utils');
 const heartbeatChecker = require('knex-utils').heartbeatChecker;
 
 class Database {
   constructor(config) {
-    this.dbInstance = require('knex')({
+    this.dbInstance = knex({
       client: 'mysql2',
       connection: config
     });
@@ -14,11 +17,15 @@ class Database {
     return response['isOk'];
   };
 
-  async getPlayers(columns, orderBy, startNumber, positions) {
-    const getColumns = () => ['id', 'first', 'last', 'position', 'team_id'].concat(columns);
+  async getPlayers(positions, focus, format, orderBy, start) {
+    const columns = (() => {
+      const statColumns = focus.reduce((columns, foc) => columns.concat(playerColumns[foc][format]), []);
+      return ['id', knex.raw('CONCAT(first, " ", last) as name'), 'position', 'team_id as team'].concat(statColumns);
+    })();
 
-    const query = await this.dbInstance.select(getColumns())
-      .from('players').orderBy(orderBy, orderBy === 'last' ? 'asc' : 'desc')
+    console.log(columns)
+    const query = await this.dbInstance.select(columns).from('players')
+      .orderBy(orderBy, orderBy === 'name' ? 'asc' : 'desc')
       .where(builder => {
         const length = positions.length;
 
@@ -30,9 +37,25 @@ class Database {
           builder.whereNotIn('position', ['QB', 'RB', 'WR', 'TE'].filter(p => !positions.includes(p)));
         };
       })
-      .limit(20).offset(startNumber);
+      .limit(20).offset(start);
+
     return query;
   };
+};
+
+const playerColumns = {
+  pass: {
+    total: ['total_pass_att', 'total_pass_cmp', 'total_pass_yd', 'total_pass_td'],
+    perAtt: ['total_pass_yd_per_cmp']
+  },
+  rush: {
+    total: ['total_rush_att', 'total_rush_yd', 'total_rush_td'],
+    perAtt: ['total_rush_yd_per_att']
+  },
+  rec: {
+    total: ['total_tgt', 'total_rec', 'total_rec_yd', 'total_rec_td'],
+    perAtt: ['total_rec_yd_per_rec']
+  }
 };
 
 exports.newConnection = async config => {

@@ -8,10 +8,13 @@ export default function Table(props) {
       <table>
         <thead>
           <tr>
-            {props.columns.map(col => (
-              <HeadCell label={col.label} colName={col.name}
-                sortValue={col.sortValue} sortBy={props.sortBy} sortable={col.sortable} 
-                onClick={props.onSort} key={col.name} />))}
+            {Object.keys(props.columns).map(k => {
+              const col = props.columns[k];
+              return (
+                <HeadCell label={col.label} colName={k}
+                  sortValue={col.sortValue} sortBy={props.sortBy} unsortable={col.unsortable} 
+                  onClick={props.onSort} key={k} />
+              )})}
           </tr> 
         </thead>
         <tbody>
@@ -23,7 +26,7 @@ export default function Table(props) {
 };
 
 function HeadCell(props) {
-  const sortBy = props.sortValue || props.colName;
+  const sortBy = props.colName;
 
   function handleClick() {
     props.onClick(sortBy);
@@ -31,7 +34,7 @@ function HeadCell(props) {
 
   return (
     <th key={props.colName} >
-      <div onClick={props.sortable ? handleClick : null} className={props.sortable ? 'sortable' : null}>
+      <div onClick={props.unsortable ? null : handleClick} className={props.unsortable ? null : 'sortable'}>
         {sortBy === props.sortBy ? <CaretUp size='0.75' mb='1' /> : null} {props.label}
       </div>
     </th>
@@ -41,7 +44,13 @@ function HeadCell(props) {
 function TableRow(props) {
   return (
     <tr>
-      {props.columns.map(col => <td key={col.name}>{col.func ? col.func(props.data) : props.data[col.name]}</td>)}
+      {Object.keys(props.columns).map(k => {
+        const col = props.columns[k]
+        return (
+          <td key={k}>
+            {col.func ? col.func(props.data) : props.data[k]}
+          </td>
+        )})}
     </tr>
   );
 };

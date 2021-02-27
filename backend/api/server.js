@@ -17,9 +17,26 @@ async function run() {
   app.use(require('cors')());
 
   app.get('/players', async (req, res) => {
-    const players = await db.getPlayers(JSON.parse(req.query.columns), req.query.sortBy, req.query.start, JSON.parse(req.query.positions));
+    const positions = req.query.pos ? utility.parseQueryJSON(req, 'pos') : ['QB', 'RB', 'WR', 'TE'];
+    const focus = req.query.fcs ? utility.parseQueryJSON(req, 'fcs') : ['pass', 'rush', 'rec'];
+    const format = req.query.frm ?? 'total';
+    const sortBy = req.query.srt ?? 'last';
 
-    res.status(200).json(players);
+    const start = (() => {
+      const defaultStart = 0;
+
+      if (req.query.start) {
+        const parsed = parseInt(req.query.start);
+        return isNaN(parsed) ? defaultStart : parsed;
+      } else return defaultStart;  
+    })();
+    
+    try {
+      const players = await db.getPlayers(positions, focus, format, sortBy, start);
+      res.status(200).json(players);
+    } catch (error) {
+      res.status(500).send();
+    }
   });
 
 

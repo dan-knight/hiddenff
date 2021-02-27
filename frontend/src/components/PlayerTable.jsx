@@ -1,32 +1,29 @@
-import React from 'react';
-import { useEffect, useMemo } from 'react';
+import React, { useEffect } from 'react';
+
+import Table from './Table';
 
 import useAxios from '../hooks/useAxios'
 import useDataStorage from '../hooks/useDataStorage';
-import Table from './Table';
 
-import useColumns from '../hooks/useColumns';
-import PlayerOverviewOptions from './PlayerOverviewOptions';
+import { playerColumns } from  '../data/columns';
 
-export default function PlayerTable(props) {
+export default function PlayerTable({ optionsState, onSort }) {
   const [loading, error, request] = useAxios();
   const [playerData, updateData, replaceData] = useDataStorage();
 
-  const [allColumns, viewColumns] = useColumns('playerOverview', props.positions);
-  const queryColumns = useMemo(() => JSON.stringify(viewColumns.map(c => c.name)), [viewColumns]);
-
   useEffect(function() {
     replacePlayerData();
-  }, [props.positions, props.sortBy]);
+  }, [optionsState]);
 
   async function getPlayerData(start=0) {
     const newData = await request({ 
-      // url: 'http://localhost:3001/players',
-      url: 'https://api.hiddenff.com/players',
+      url: 'http://localhost:3001/players',
+      // url: 'https://api.hiddenff.com/players',
       params: {
-        columns: queryColumns,
-        positions: JSON.stringify(props.positions),
-        sortBy: props.sortBy,
+        pos: JSON.stringify(optionsState.pos),
+        srt: optionsState.srt,
+        fcs: JSON.stringify(optionsState.fcs),
+        frm: optionsState.frm,
         start: start
       }
     })
@@ -42,9 +39,17 @@ export default function PlayerTable(props) {
     updateData(await getPlayerData(playerData.length));
   };
 
-  return (
-    <main>
-      <Table data={playerData} columns={allColumns} sortBy={props.sortBy} loading={loading} onSort={props.onSort} />
-    </main>
-  ); 
+  const columns = (() => { 
+    const columnData = playerColumns();
+
+    const getDataColumns = () => {
+      const allColumns = Object.keys(playerData[0]);
+      const columnNames = allColumns.filter(col => !['id'].includes(col));
+      return columnNames.reduce((columns, n) => ({ ...columns, [n]: columnData[n]}), {});
+    };
+
+    return playerData.length > 0 ? getDataColumns() : {}; 
+  })();
+
+  return <Table data={playerData} columns={columns} sortBy={optionsState.srt} loading={loading} onSort={onSort} />; 
 }

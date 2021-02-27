@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 
 export default function TopNav() {
   return (
@@ -23,7 +24,7 @@ function Links(props) {
     <ul style={props.style}>
       {links.map(l => (
         <li>
-          <a href={l.url}>{l.label}</a>
+          <Link to={l.url}>{l.label}</Link>
         </li>
       ))}
     </ul>
@@ -32,8 +33,8 @@ function Links(props) {
 
 function Logo() {
   return (
-    <a href="/">
+    <Link to='/'>
       <h4 align="center"><span>hidden</span>FF</h4>
-    </a>
+    </Link>
   );
 };

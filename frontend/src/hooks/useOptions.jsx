@@ -20,7 +20,14 @@ export default function useOptions(optionsData) {
   };
 
   function updateMultipleSelection(prevSelected, value) {
-    return prevSelected.includes(value) ? prevSelected.filter(o => o !== value) : [ ...prevSelected, value ]
+    const add = () => [ ...prevSelected, value ];
+
+    function remove() {
+      const filtered = prevSelected.filter(o => o !== value);
+      return filtered.length < 1 ? [value] : filtered;
+    };
+
+    return prevSelected.includes(value) ? remove() : add(); 
   }
 
   const reducer = (state, { id, value }) => (
