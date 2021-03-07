@@ -18,7 +18,6 @@ async function run() {
 
   app.get('/players', async (req, res) => {
     const positions = req.query.pos ? utility.parseQueryJSON(req, 'pos') : ['QB', 'RB', 'WR', 'TE'];
-    const focus = req.query.fcs ? utility.parseQueryJSON(req, 'fcs') : ['pass', 'rush', 'rec'];
     const format = req.query.frm ?? 'total';
     const sortBy = req.query.srt ?? 'last';
 
@@ -32,7 +31,7 @@ async function run() {
     })();
     
     try {
-      const players = await db.getPlayers(positions, focus, format, sortBy, start);
+      const players = await db.getPlayers(positions, format, sortBy, start);
       res.status(200).json(players);
     } catch (error) {
       res.status(500).send();

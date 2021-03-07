@@ -17,15 +17,41 @@ class Database {
     return response['isOk'];
   };
 
-  async getPlayers(positions, focus, format, orderBy, start) {
+  async getPlayers(positions, format, orderBy, start) {
     const columns = (() => {
-      const statColumns = focus.reduce((columns, foc) => columns.concat(playerColumns[foc][format]), []);
-      return ['id', knex.raw('CONCAT(first, " ", last) as name'), 'position', 'team_id as team'].concat(statColumns);
+      const positionColumns = (() => {
+        const statTypes = new Set();
+
+        function addPositionStats(position) {
+          positionStats[position].forEach(s => { statTypes.add(s); });
+        };
+
+        positions.forEach(p => { addPositionStats(p); });
+        
+        return [...statTypes].reduce((cols, stat) => cols.concat(playerColumns[stat][format]), [])
+      })();
+
+      // const statColumns = focus.reduce((columns, foc) => columns.concat(playerColumns[foc][format]), []);
+      return ['id', knex.raw('CONCAT(first, " ", last) as name'), 'position', 'team_id as team'].concat(positionColumns);
     })();
 
-    console.log(columns)
+    function formatOrderBy() {
+      const defaultOrder = ['last', 'asc'];
+      
+      function formatColumn() {
+        return columns.includes(orderBy) ? [orderBy, 'desc'] : defaultOrder;
+      };
+
+      if (orderBy === 'name') {
+        return defaultOrder;
+      } else return formatColumn();
+    }
+
+    const [orderColumn, orderDirection] = formatOrderBy();
+
     const query = await this.dbInstance.select(columns).from('players')
-      .orderBy(orderBy, orderBy === 'name' ? 'asc' : 'desc')
+      // .orderBy(orderBy, orderBy === 'name' ? 'asc' : 'desc')
+      .orderBy(orderColumn, orderDirection)
       .where(builder => {
         const length = positions.length;
 
@@ -39,8 +65,18 @@ class Database {
       })
       .limit(20).offset(start);
 
-    return query;
+    return {
+      data: query,
+      sortedBy: orderColumn
+    };
   };
+};
+
+const positionStats = {
+  QB: ['pass', 'rush'],
+  RB: ['rush', 'rec'],
+  WR: ['rec'],
+  TE: ['rec']
 };
 
 const playerColumns = {

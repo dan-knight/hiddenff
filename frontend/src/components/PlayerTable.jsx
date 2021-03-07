@@ -22,7 +22,6 @@ export default function PlayerTable({ optionsState, onSort }) {
       params: {
         pos: JSON.stringify(optionsState.pos),
         srt: optionsState.srt,
-        fcs: JSON.stringify(optionsState.fcs),
         frm: optionsState.frm,
         start: start
       }
@@ -32,7 +31,12 @@ export default function PlayerTable({ optionsState, onSort }) {
   };
 
   async function replacePlayerData() {
-    replaceData(await getPlayerData())
+    const response = await getPlayerData();
+    replaceData(response.data);
+    
+    if (response.sortedBy !== optionsState.srt) {
+      onSort(response.sortedBy);
+    };
   };
 
   async function updatePlayerData() {
