@@ -1,5 +1,4 @@
 import React, { createRef, forwardRef, useEffect, useState } from 'react';
-import $ from 'jquery';
 import Divider from './Divider';
 
 export default function Accordion({ label, collapseID, ...props }) {

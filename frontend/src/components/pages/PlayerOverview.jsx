@@ -1,7 +1,5 @@
 import React, { useMemo } from 'react';
 
-import View from '../View';
-import Sidebar from '../Sidebar';
 import PlayerTable from '../PlayerTable';
 
 import useOptions from '../../hooks/useOptions';
@@ -63,17 +61,16 @@ export default function PlayerOverview() {
     }), []);
   
   const selectOptions = IDs => IDs.reduce((data, id) => ({ ...data, [id]: optionsData[id] }), {});
-  const sidebarOptions = useMemo(() => selectOptions(['pos', 'gms']), []);
-  const mainOptions = useMemo(() => selectOptions(['prj', 'fcs', 'frm']), []);
+  const mainOptions = useMemo(() => selectOptions(['pos', 'gms', 'prj', 'frm']), []);
 
   const [optionsState, updateOptionsState] = useOptions(optionsData);
 
   return (
-      <View sidebar={<Sidebar options={sidebarOptions} optionSelections={optionsState} onChange={updateOptionsState} />}>
+      <main>
         <MainOptions options={mainOptions} optionsState={optionsState} 
           searchbarPlaceholder="Search Players"
           onChange={updateOptionsState} />
         <PlayerTable optionsState={optionsState} onSort={value => { updateOptionsState(value, 'srt'); }} />
-      </View>
+      </main>
   );
 };

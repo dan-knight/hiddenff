@@ -96,16 +96,6 @@ main {
   }
 }
 
-.sidebar, .sidebar-buffer {
-  $bg: $bg-low;
-
-  background: $bg;
-
-  $border-side: 'right';
-  @include mixins.borderStyle($border-side);
-  border-#{$border-side}-color: $divider-color;
-}
-
 .searchbar {
   background: $bg-low;
   @include mixins.borderStyle();

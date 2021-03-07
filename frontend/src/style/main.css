@@ -98,17 +98,12 @@ input, button {
 }
 
 .container {
-  display: grid;
-  grid-template-columns: 1fr 4fr;
-  grid-template-rows: auto 1fr;
   position: absolute;
   width: 100%;
   height: 100%;
 }
 
 nav {
-  grid-row: 1;
-  grid-column: 2;
   padding: 0 2rem;
 }
 nav > div {
@@ -118,8 +113,6 @@ nav > div {
 }
 
 main {
-  grid-column: 2;
-  grid-row: 2;
   overflow: hidden;
 }
 main .options {
@@ -153,28 +146,6 @@ main tr > :last-child {
 main .options, main footer {
   padding-left: 2rem;
   padding-right: 2rem;
-}
-
-.sidebar {
-  padding: 0 2rem;
-}
-
-.sidebar, .sidebar-buffer {
-  grid-column: 1;
-}
-
-.sidebar {
-  grid-row: 2;
-}
-.sidebar > div {
-  margin-bottom: 1rem;
-}
-.sidebar .divider {
-  padding-top: 1rem;
-}
-
-.sidebar-buffer {
-  grid-row: 1;
 }
 
 .searchbar {
@@ -340,13 +311,6 @@ main th, main td {
 }
 main tbody tr:hover {
   background: rgba(113, 226, 221, 0.1) !important;
-}
-
-.sidebar, .sidebar-buffer {
-  background: #0F1111;
-  border-right-width: 0.1rem;
-  border-right-style: solid;
-  border-right-color: #363D3D;
 }
 
 .searchbar {

@@ -2,19 +2,12 @@ $outer-spacing: 2rem;
 $inner-spacing: $outer-spacing * 0.5;
 
 .container {
-  display: grid;
-
-  grid-template-columns: 1fr 4fr;
-  grid-template-rows: auto 1fr;
-
   position: absolute;
   width: 100%;
   height: 100%;
 }
 
 nav {
-  grid-row: 1;
-  grid-column: 2;
   padding: 0 $outer-spacing;
 
   > div {
@@ -25,8 +18,6 @@ nav {
 }
 
 main {
-  grid-column: 2;
-  grid-row: 2;
   overflow: hidden;
 
   .options {
@@ -72,30 +63,6 @@ main {
     padding-right: $outer-spacing;
   }
 
-}
-
-.sidebar {
-  padding: 0 $outer-spacing;
-}
-
-.sidebar, .sidebar-buffer {
-  grid-column: 1;
-}
-
-.sidebar {
-  grid-row: 2;
-
-  > div {
-    margin-bottom: $inner-spacing;
-  }
-
-  .divider {
-    padding-top: $inner-spacing;
-  }
-}
-
-.sidebar-buffer {
-  grid-row: 1;
 }
 
 .searchbar {
