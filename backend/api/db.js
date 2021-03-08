@@ -17,7 +17,7 @@ class Database {
     return response['isOk'];
   };
 
-  async getPlayers(positions, format, orderBy, start) {
+  async getPlayers(positions, format, orderBy, search, start) {
     const columns = (() => {
       const positionColumns = (() => {
         const statTypes = new Set();
@@ -37,7 +37,7 @@ class Database {
 
     function formatOrderBy() {
       const defaultOrder = ['last', 'asc'];
-      
+
       function formatColumn() {
         return columns.includes(orderBy) ? [orderBy, 'desc'] : defaultOrder;
       };
@@ -49,25 +49,29 @@ class Database {
 
     const [orderColumn, orderDirection] = formatOrderBy();
 
-    const query = await this.dbInstance.select(columns).from('players')
-      // .orderBy(orderBy, orderBy === 'name' ? 'asc' : 'desc')
-      .orderBy(orderColumn, orderDirection)
-      .where(builder => {
-        const length = positions.length;
+    const positionFilter = builder => {
+      const length = positions.length;
 
-        if (length < 3) {
-          builder.whereIn('position', positions);
-        } else if (length > 3) {
-          builder.whereNotIn('position', []);
-        } else {
-          builder.whereNotIn('position', ['QB', 'RB', 'WR', 'TE'].filter(p => !positions.includes(p)));
-        };
-      })
-      .limit(20).offset(start);
+      if (length < 3) {
+        builder.whereIn('position', positions);
+      } else if (length > 3) {
+        builder.whereNotIn('position', []);
+      } else {
+        builder.whereNotIn('position', ['QB', 'RB', 'WR', 'TE'].filter(p => !positions.includes(p)));
+      };
+    };
+
+    const searchFilter = knex.raw(`CONCAT(first, " ", last) LIKE "%${search}%"`);
+
+    const query = await this.dbInstance.select(columns).from('players')
+      .orderBy(orderColumn, orderDirection)
+      .where(search ? searchFilter : positionFilter)
+      .limit(20).offset(start)
+      .debug(true);
 
     return {
       data: query,
-      sortedBy: orderColumn
+      sortedBy: orderColumn === 'last' ? 'name' : orderColumn
     };
   };
 };

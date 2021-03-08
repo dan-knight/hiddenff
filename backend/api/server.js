@@ -20,6 +20,7 @@ async function run() {
     const positions = req.query.pos ? utility.parseQueryJSON(req, 'pos') : ['QB', 'RB', 'WR', 'TE'];
     const format = req.query.frm ?? 'total';
     const sortBy = req.query.srt ?? 'last';
+    const search = req.query.sch ?? '';
 
     const start = (() => {
       const defaultStart = 0;
@@ -31,10 +32,10 @@ async function run() {
     })();
     
     try {
-      const players = await db.getPlayers(positions, format, sortBy, start);
+      const players = await db.getPlayers(positions, format, sortBy, search, start);
       res.status(200).json(players);
     } catch (error) {
-      res.status(500).send();
+      res.status(500).send(error);
     }
   });
 
