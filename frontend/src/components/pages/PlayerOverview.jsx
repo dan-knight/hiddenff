@@ -57,6 +57,10 @@ export default function PlayerOverview() {
       'srt': {
         default: 'name',
         single: true
+      },
+      'sch': {
+        default: '',
+        single: true
       }
     }), []);
   
