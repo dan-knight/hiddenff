@@ -15,66 +15,66 @@ export default function PlayerOverview() {
         { label: 'Running Backs', value: 'RB' },
         { label: 'Wide Receivers', value: 'WR' },
         { label: 'Tight Ends', value: 'TE' }
-      ]},
-      'gms': { 
-        label: 'Games',  
-        default: 'main',
-        buttons: [
-          { label: 'Full Slate', value: 'full' },
-          { label: 'Main Slate Only', value: 'main' },
-          { label: 'Primetime Slate', value: 'prime' }
-        ],
-        single: true
-      },
-      'prj': { 
-        label: 'Projection Type',
-        default: 'average',
-        buttons: [
-          {label: 'Floor', value: 'floor'},
-          {label: 'Average', value: 'average'},
-          {label: 'Ceiling', value: 'ceiling'}
-        ],
-        single: true,
-      },
-      'fcs': { 
-        label: 'Statistics Focus',
-        default: 'rush', 
-        buttons: [
-          {label: 'Rushing', value: 'rush'},
-          {label: 'Receiving', value: 'rec'},
-          {label: 'Passing', value: 'pass'},
-      ]},
-      'frm': { 
-        label: 'Statistics Format',
-        default: 'total',
-        buttons: [
-          {label: 'Season Total', value: 'total'},
-          // {label: 'Per Game', value: 'per_game'},
-          {label: 'Per Attempt', value: 'perAtt'}
-        ], 
-        single: true
-      },
-      'srt': {
-        default: 'name',
-        single: true
-      },
-      'sch': {
-        default: '',
-        single: true
-      }
+      ], 
+      type: 'multi'
+    },
+  'gms': { 
+      label: 'Games',  
+      default: 'main',
+      buttons: [
+        { label: 'Full Slate', value: 'full' },
+        { label: 'Main Slate Only', value: 'main' },
+        { label: 'Primetime Slate', value: 'prime' }
+      ]
+    },
+    'prj': { 
+      label: 'Projection Type',
+      default: 'average',
+      buttons: [
+        {label: 'Floor', value: 'floor'},
+        {label: 'Average', value: 'average'},
+        {label: 'Ceiling', value: 'ceiling'}
+      ]
+    },
+    'frm': { 
+      label: 'Statistics Format',
+      default: 'total',
+      buttons: [
+        {label: 'Season Total', value: 'total'},
+        // {label: 'Per Game', value: 'per_game'},
+        {label: 'Per Attempt', value: 'perAtt'}
+      ]
+    },
+    'srt': {
+      default: 'name'
+    },
+    'sch': {
+      default: ''
+    }
     }), []);
   
   const selectOptions = IDs => IDs.reduce((data, id) => ({ ...data, [id]: optionsData[id] }), {});
   const mainOptions = useMemo(() => selectOptions(['pos', 'gms', 'prj', 'frm']), []);
 
-  const [optionsState, updateOptionsState] = useOptions(optionsData);
+  const [optionsState, updateOptionsState] = useOptions(optionsData, (state, { value, id }) => {
+    switch (id) {
+      case 'sch':
+        return { ...state, sch: value, pos: optionsData.pos.default };
+      case 'pos':
+        return { ...state, sch: '', pos: value };
+    }
+  });
+
+  function handleOptionsChange(value, key) {
+    updateOptionsState(value, key);
+  }
 
   return (
       <main>
         <MainOptions options={mainOptions} optionsState={optionsState} 
           searchbarPlaceholder="Search Players"
-          onChange={updateOptionsState} />
-        <PlayerTable optionsState={optionsState} onSort={value => { updateOptionsState(value, 'srt'); }} />
+          onChange={handleOptionsChange} />
+        <PlayerTable optionsState={optionsState} onSort={value => { handleOptionsChange(value, 'srt'); }} />
       </main>
   );
 };

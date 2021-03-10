@@ -5,11 +5,21 @@ export default function useDebounce(value, delay) {
   const [debouncedValue, setDebouncedValue] = useState(value);
 
   const [inProgress, setInProgress] = useState(false);
+  let doLater;
+
+  console.log(value, inProgress)
+
+  function clear() {
+    clearTimeout(doLater);
+  };
+
+  function changeValue(newValue) {
+    setInProgress(true);
+    setTempValue(newValue);
+  }
 
   useEffect(() => {
-    setInProgress(true);
-
-    const doLater = setTimeout(() => { 
+    doLater = setTimeout(() => { 
       setDebouncedValue(tempValue); 
       setInProgress(false);
     }, delay);
@@ -19,5 +29,5 @@ export default function useDebounce(value, delay) {
     };
   }, [tempValue]);
 
-  return [debouncedValue, tempValue, setTempValue, inProgress];
+  return [debouncedValue, tempValue, changeValue, inProgress, clear];
 };

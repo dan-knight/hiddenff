@@ -1,16 +1,25 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import useDebounce from '../hooks/useDebounce';
 
-export default function Searchbar({ placeholder, onChange }) {
-  const [apiText, uiText, setText] = useDebounce('', 250);
+export default function Searchbar({ placeholder, stateText, onChange }) {
+  const [uiText, setUIText] = useState('');
+  const [debouncedText, tempText, setTempText, inProgress, clearDebounce] = useDebounce('', 250);
 
   useEffect(() => {
-    onChange(apiText);
-  }, [apiText]);
+    onChange(debouncedText);
+  }, [debouncedText]);
+
+  useEffect(() => {
+    clearDebounce();
+    setUIText(stateText);
+  }, [stateText]);
 
   function handleChange(e) {
     e.preventDefault();
-    setText(e.target.value);
+
+    const newText = e.target.value;
+    setUIText(newText);
+    setTempText(newText);
   }
 
   return (

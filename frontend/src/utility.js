@@ -8,6 +8,6 @@ export function combineArrays(...arrays) {
   return [].concat(...arrays);
 };
 
-export const isSelected = (value, selection, single) => {
-  return single ? value === selection : selection.includes(value)
+export const isSelected = (value, selection) => {
+  return Array.isArray(selection) ? selection.includes(value) : value === selection;
 };
