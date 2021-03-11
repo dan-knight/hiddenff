@@ -23,7 +23,7 @@ function Links(props) {
   return (
     <ul style={props.style}>
       {links.map(l => (
-        <li>
+        <li key={l.url}>
           <Link to={l.url}>{l.label}</Link>
         </li>
       ))}

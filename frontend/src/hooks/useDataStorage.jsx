@@ -4,7 +4,7 @@ export default function useDataStorage() {
   const [data, setData] = useState([]);
 
   function update(newData) {
-    setData([...data, newData]);
+    setData([...data, ...newData]);
   };
 
   function replace(newData) {

@@ -12,7 +12,7 @@ export default function PlayerTable({ optionsState, onSort }) {
   const [playerData, updateData, replaceData] = useDataStorage();
 
   useEffect(function() {
-    replacePlayerData();
+    updatePlayerData();
   }, [optionsState]);
 
   async function getPlayerData(start=0) {
@@ -31,17 +31,20 @@ export default function PlayerTable({ optionsState, onSort }) {
     return newData;
   };
 
-  async function replacePlayerData() {
-    const response = await getPlayerData();
-    replaceData(response.data);
+  async function updatePlayerData(start=0) {
+    const response = await getPlayerData(start);
+
+    if (start === 0) {
+      replaceData(response.data);
+    } else updateData(response.data);
 
     if (response.sortedBy !== optionsState.srt) {
       onSort(response.sortedBy);
     };
   };
 
-  async function updatePlayerData() {
-    updateData(await getPlayerData(playerData.length));
+  function handleScrollBottom() {
+    updatePlayerData(playerData.length);
   };
 
   const columns = (() => { 
@@ -56,5 +59,8 @@ export default function PlayerTable({ optionsState, onSort }) {
     return playerData.length > 0 ? getDataColumns() : {}; 
   })();
 
-  return <Table data={playerData} columns={columns} sortBy={optionsState.srt} loading={loading} onSort={onSort} />; 
+  return (
+    <Table data={playerData} columns={columns} sortBy={optionsState.srt} 
+      loading={loading} onSort={onSort} onScrollBottom={handleScrollBottom} />
+  ); 
 }

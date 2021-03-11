@@ -1,10 +1,15 @@
 import React from 'react';
+import useBottomScroll from '../hooks/useBottomScroll';
 
 import { CaretUp } from './Icons';
 
 export default function Table(props) {
+  const handleScroll = useBottomScroll(() => { 
+    props.onScrollBottom(); 
+  });
+
   return (
-    <div className="data">
+    <div className="data" onScroll={handleScroll}>
       <table>
         <thead>
           <tr>

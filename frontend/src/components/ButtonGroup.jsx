@@ -26,7 +26,7 @@ function SingleButtonGroup({ options, selection, onChange }) {
   return (
     <React.Fragment>
       {options.map(b => (
-        <Button value={b.value} label={b.label} 
+        <Button value={b.value} label={b.label} key={b.value}
         isSelected={isSelected(b.value, selection)} onChange={onChange} />
       ))}
     </React.Fragment>
@@ -63,7 +63,7 @@ function MultiButtonGroup({ options, stateSelection, onChange }) {
   return (
     <React.Fragment>
       {options.map(b => (
-        <Button value={b.value} label={b.label} 
+        <Button value={b.value} label={b.label} key={b.value}
         isSelected={isSelected(b.value, uiSelection)} onChange={handleChange} />
       ))}
     </React.Fragment>

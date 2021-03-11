@@ -7,8 +7,6 @@ export default function useDebounce(value, delay) {
   const [inProgress, setInProgress] = useState(false);
   let doLater;
 
-  console.log(value, inProgress)
-
   function clear() {
     clearTimeout(doLater);
   };
