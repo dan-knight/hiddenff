@@ -1,0 +1,21 @@
+@use 'mixins';
+@use 'colors';
+
+$divider-color: colors.$grey-700;
+$light-divider-color: colors.$grey-300;
+
+nav.temp {
+  > div {
+    display: block;
+    
+    $border-side: 'bottom';
+    @include mixins.borderStyle($border-side);
+    border-#{$border-side}-color: $divider-color;
+  }
+}
+
+body.light {
+  nav.temp {
+    border-color: $light-divider-color;
+  }
+}

@@ -13,10 +13,19 @@ export default function TopNav() {
   );
 };
 
+export function TempTopNav() {
+  return (
+    <nav className="temp">
+      <div>
+        <Logo />  
+      </div>
+    </nav>
+    );
+};
+
 const links = [
   { url: '/players', label: 'Players' },
-  { url: '/teams', label: 'Teams' },
-  { url: '/settings', label: 'Settings' }
+  { url: '/teams', label: 'Teams' }
 ];
 
 function Links(props) {

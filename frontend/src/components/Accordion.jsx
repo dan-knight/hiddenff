@@ -1,5 +1,6 @@
 import React, { createRef, forwardRef, useEffect, useState } from 'react';
 import Divider from './Divider';
+import { ChevronDown } from './Icons';
 
 export default function Accordion({ label, collapseID, ...props }) {
   const [isClosed, height, ref, handleToggle] = useCollapse();
@@ -21,7 +22,9 @@ export default function Accordion({ label, collapseID, ...props }) {
 function Toggle({ label, onToggle }) {
   return (
     <div className="toggle" onClick={onToggle}>
-      <h5>{label}</h5>
+      <div className="container">
+        <h5>{label}</h5><ChevronDown size={1.25} />
+      </div>
     </div>
   );
 };

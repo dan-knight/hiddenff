@@ -18,24 +18,24 @@ export default function PlayerOverview() {
       ], 
       type: 'multi'
     },
-  'gms': { 
-      label: 'Games',  
-      default: 'main',
-      buttons: [
-        { label: 'Full Slate', value: 'full' },
-        { label: 'Main Slate Only', value: 'main' },
-        { label: 'Primetime Slate', value: 'prime' }
-      ]
-    },
-    'prj': { 
-      label: 'Projection Type',
-      default: 'average',
-      buttons: [
-        {label: 'Floor', value: 'floor'},
-        {label: 'Average', value: 'average'},
-        {label: 'Ceiling', value: 'ceiling'}
-      ]
-    },
+  // 'gms': { 
+  //     label: 'Games',  
+  //     default: 'main',
+  //     buttons: [
+  //       { label: 'Full Slate', value: 'full' },
+  //       { label: 'Main Slate Only', value: 'main' },
+  //       { label: 'Primetime Slate', value: 'prime' }
+  //     ]
+  //   },
+    // 'prj': { 
+    //   label: 'Projection Type',
+    //   default: 'average',
+    //   buttons: [
+    //     {label: 'Floor', value: 'floor'},
+    //     {label: 'Average', value: 'average'},
+    //     {label: 'Ceiling', value: 'ceiling'}
+    //   ]
+    // },
     'frm': { 
       label: 'Statistics Format',
       default: 'total',
@@ -54,7 +54,7 @@ export default function PlayerOverview() {
     }), []);
   
   const selectOptions = IDs => IDs.reduce((data, id) => ({ ...data, [id]: optionsData[id] }), {});
-  const mainOptions = useMemo(() => selectOptions(['pos', 'gms', 'prj', 'frm']), []);
+  const mainOptions = useMemo(() => selectOptions(['pos', 'frm']), []);
 
   const [optionsState, updateOptionsState] = useOptions(optionsData, (state, { value, id }) => {
     switch (id) {

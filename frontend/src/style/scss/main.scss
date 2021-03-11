@@ -6,6 +6,8 @@
 
 @use 'lighttheme';
 
+@use 'temp';
+
 $bg-high: colors.$grey-800;
 $bg-medium: colors.$grey-850;
 $bg-low: colors.$grey-900;
@@ -58,6 +60,7 @@ main {
     font-weight: 300;
     
     cursor: pointer;
+
     h5 {
       font-size: 1rem;
     }
@@ -163,7 +166,6 @@ button {
 
 .toggle {
   h5 {
-    margin: 0;
     line-height: 1;
   }
 

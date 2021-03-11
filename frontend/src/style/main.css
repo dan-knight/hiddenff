@@ -97,7 +97,7 @@ input, button {
   font-family: inherit;
 }
 
-.container {
+.view {
   position: absolute;
   width: 100%;
   height: 100%;
@@ -207,6 +207,17 @@ button {
 .toggle {
   padding: 1rem 0;
 }
+.toggle .container {
+  display: inline-flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.toggle h5 {
+  margin: 0;
+}
+.toggle svg {
+  padding-left: 1.25rem;
+}
 
 body.light {
   background: #FAFAFA;
@@ -240,6 +251,17 @@ body.light button:hover {
   border-color: #5E6868;
 }
 body.light .divider {
+  border-color: #D2D6D6;
+}
+
+nav.temp > div {
+  display: block;
+  border-bottom-width: 0.1rem;
+  border-bottom-style: solid;
+  border-bottom-color: #363D3D;
+}
+
+body.light nav.temp {
   border-color: #D2D6D6;
 }
 
@@ -380,7 +402,6 @@ button.selected:hover {
   cursor: pointer;
 }
 .toggle h5 {
-  margin: 0;
   line-height: 1;
 }
 
